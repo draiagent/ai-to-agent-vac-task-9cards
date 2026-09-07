@@ -12,7 +12,7 @@
 開啟 `index.html` 即可，或啟用 GitHub Pages 後訪問：
 
 ```
-https://<your-username>.github.io/ai-to-agent-vac-task-9cards/
+https://draiagent.github.io/ai-to-agent-vac-task-9cards/
 ```
 
 啟用方式：Repository → Settings → Pages → Source 選 `main` 分支的 `/ (root)`。
@@ -85,6 +85,7 @@ https://<your-username>.github.io/ai-to-agent-vac-task-9cards/
 ai-to-agent-vac-task-9cards/
 ├── index.html          # 首頁（卡片索引）
 ├── README.md
+├── LICENSE             # CC BY-SA 4.0
 ├── .nojekyll           # 讓 GitHub Pages 直接輸出靜態檔
 └── cards/
     ├── 00-series-index.html
@@ -114,8 +115,8 @@ ai-to-agent-vac-task-9cards/
 
 ## 授權
 
-尚未指定授權條款。若要開放他人使用，建議於 GitHub 建立 repo 時一併選擇
-（教學素材常見選擇為 CC BY-NC-SA 4.0，程式碼部分則常用 MIT）。
+本系列（HTML 卡片、文件）以 [CC BY-SA 4.0](LICENSE) 釋出：可自由使用、修改與再散布，
+須標示出處並以相同條款分享。署名：AI Coach 益力康陳董｜2026 AI to Agent。
 
 ---
 

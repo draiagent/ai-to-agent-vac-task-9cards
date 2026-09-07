@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI Agent 企業應用地圖｜系列總覽</title>
+<meta name="description" content="九種企業 AI Agent 任務的總覽地圖：四大類型分類、共通 8 步驟骨架，以及 Agent 該做到哪裡、人該接手哪一步的判斷表。">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
 
 :root{
   --bg-a:#EAF2FB; --bg-b:#F6F9FD;
@@ -99,6 +100,17 @@ body{
 .one-col .items{grid-template-columns:1fr}
 .item.soon{border-style:dashed; opacity:.62}
 .item.soon .ti{color:var(--text)}
+a.item{text-decoration:none; color:inherit; transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease}
+a.item:hover{transform:translateY(-2px); box-shadow:0 12px 26px rgba(15,23,42,.12); border-color:transparent}
+a.item .ti::after{content:" →"; font-weight:700; opacity:.45}
+
+.back{max-width:1080px; margin:0 auto 14px}
+.back a{
+  display:inline-flex; align-items:center; gap:6px; text-decoration:none;
+  font-size:13.5px; font-weight:700; color:var(--s1a);
+  background:#fff; border:1px solid var(--line); border-radius:999px; padding:7px 16px;
+}
+.back a:hover{background:#F1F5FB}
 
 .gA .tag{background:linear-gradient(135deg,var(--s3a),var(--s3b))}
 .gA .risk{background:#FEEBD9;color:#C2560A}
@@ -150,6 +162,7 @@ td b{color:var(--ink)}
 </style>
 </head>
 <body>
+<div class="back"><a href="../index.html">← 返回首頁</a></div>
 <div class="wrap">
 
   <div class="hero">
@@ -200,9 +213,9 @@ td b{color:var(--ink)}
       <span class="risk">風險：品質與合規用語</span>
     </div>
     <div class="items">
-      <div class="item"><span class="id">01</span><span class="ti">剪影片</span><span class="de">素材解析 → 語音理解 → 剪輯決策 → QA 定稿</span></div>
-      <div class="item"><span class="id">02</span><span class="ti">行銷簡報</span><span class="de">需求定義 → 敘事架構 → 文案圖表 → 組裝覆核</span></div>
-      <div class="item"><span class="id">03</span><span class="ti">短影音腳本</span><span class="de">選題定位 → Hook 設計 → 分鏡字幕 → 合規檢查</span></div>
+      <a class="item" href="01-video-editing.html"><span class="id">01</span><span class="ti">剪影片</span><span class="de">素材解析 → 語音理解 → 剪輯決策 → QA 定稿</span></a>
+      <a class="item" href="02-marketing-deck.html"><span class="id">02</span><span class="ti">行銷簡報</span><span class="de">需求定義 → 敘事架構 → 文案圖表 → 組裝覆核</span></a>
+      <a class="item" href="03-short-video-script.html"><span class="id">03</span><span class="ti">短影音腳本</span><span class="de">選題定位 → Hook 設計 → 分鏡字幕 → 合規檢查</span></a>
     </div>
   </div>
 
@@ -213,8 +226,8 @@ td b{color:var(--ink)}
       <span class="risk">風險：數字正確與行動落地</span>
     </div>
     <div class="items">
-      <div class="item"><span class="id">04</span><span class="ti">財務月報表</span><span class="de">資料串接 → 清洗計算 → 差異分析 → 覆核簽名</span></div>
-      <div class="item"><span class="id">05</span><span class="ti">營運數據週報</span><span class="de">指標定義 → 週期比對 → 異常偵測 → 行動追蹤</span></div>
+      <a class="item" href="04-finance-monthly.html"><span class="id">04</span><span class="ti">財務月報表</span><span class="de">資料串接 → 清洗計算 → 差異分析 → 覆核簽名</span></a>
+      <a class="item" href="05-ops-weekly.html"><span class="id">05</span><span class="ti">營運數據週報</span><span class="de">指標定義 → 週期比對 → 異常偵測 → 行動追蹤</span></a>
       
     </div>
   </div>
@@ -226,9 +239,9 @@ td b{color:var(--ink)}
       <span class="risk">風險：來源真實性與判定越權</span>
     </div>
     <div class="items">
-      <div class="item"><span class="id">06</span><span class="ti">競品分析</span><span class="de">範圍界定 → 廣度蒐集 → 來源驗證 → 人工判讀</span></div>
-      <div class="item"><span class="id">07</span><span class="ti">法規合規查核</span><span class="de">適用界定 → 條文取得 → 逐項比對 → 專業覆核</span></div>
-      <div class="item"><span class="id">08</span><span class="ti">品質 QA 稽核</span><span class="de">標準彙整 → 抽樣規劃 → 缺失分級 → 複核結案</span></div>
+      <a class="item" href="06-competitive-analysis.html"><span class="id">06</span><span class="ti">競品分析</span><span class="de">範圍界定 → 廣度蒐集 → 來源驗證 → 人工判讀</span></a>
+      <a class="item" href="07-regulatory-compliance.html"><span class="id">07</span><span class="ti">法規合規查核</span><span class="de">適用界定 → 條文取得 → 逐項比對 → 專業覆核</span></a>
+      <a class="item" href="08-quality-qa-audit.html"><span class="id">08</span><span class="ti">品質 QA 稽核</span><span class="de">標準彙整 → 抽樣規劃 → 缺失分級 → 複核結案</span></a>
     </div>
   </div>
 
@@ -239,7 +252,7 @@ td b{color:var(--ink)}
       <span class="risk">風險：最高，僅能輔助</span>
     </div>
     <div class="items">
-      <div class="item"><span class="id">09</span><span class="ti">研究配方輔助</span><span class="de">法規框定 → 證據分級 → 風險預檢 → 專業定案</span></div>
+      <a class="item" href="09-formulation-research.html"><span class="id">09</span><span class="ti">研究配方輔助</span><span class="de">法規框定 → 證據分級 → 風險預檢 → 專業定案</span></a>
     </div>
   </div>
 
