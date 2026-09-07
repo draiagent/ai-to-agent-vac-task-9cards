@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Agent 做法規合規查核的 8 個步驟</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+:root{
+  --bg-a:#EAF2FB; --bg-b:#F6F9FD;
+  --ink:#0F172A; --text:#5B6472; --line:#E5E9EF;
+  --s1a:#2F6FED; --s1b:#5B9BFF;
+  --s2a:#6C4CE0; --s2b:#9A7CF5;
+  --s3a:#F97316; --s3b:#FBA94C;
+  --s4a:#10B981; --s4b:#4ADE80;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Noto Sans TC','Inter',sans-serif;
+  background:linear-gradient(170deg,var(--bg-a),var(--bg-b) 45%,#FFF);
+  color:var(--ink); padding:34px 22px 60px;
+}
+.wrap{max-width:1080px;margin:0 auto}
+
+.hero{
+  position:relative; text-align:center; padding:26px 20px 30px;
+  background:linear-gradient(135deg,#DCEAFB,#EEF4FD);
+  border-radius:26px; overflow:hidden; margin-bottom:24px;
+}
+.hero h1{font-size:44px; font-weight:900; letter-spacing:-.02em; line-height:1.2}
+.hero h1 .hl{color:var(--s1a)}
+.hero h1 .hl2{color:var(--s3a)}
+.hero .sub{
+  display:inline-block; margin-top:12px; padding:8px 22px;
+  background:var(--ink); color:#fff; border-radius:999px;
+  font-size:16px; font-weight:700;
+}
+.chips{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:16px}
+.chip{
+  background:#fff; border:1px solid var(--line); border-radius:999px;
+  padding:6px 15px; font-size:13px; font-weight:700; color:var(--s1a);
+}
+.chip:nth-child(2){color:var(--s2a)} .chip:nth-child(3){color:var(--s3a)}
+.chip:nth-child(4){color:var(--s4a)} .chip:nth-child(5){color:#0EA5E9}
+.bot{position:absolute; right:20px; bottom:8px}
+.bot2{position:absolute; left:20px; bottom:8px; transform:scaleX(-1)}
+
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+.card{
+  background:#fff; border-radius:22px; overflow:hidden;
+  box-shadow:0 10px 34px rgba(15,23,42,.07);
+  display:flex; flex-direction:column;
+}
+.card .top{display:flex; align-items:stretch; gap:14px; padding:16px 18px 4px}
+.num{
+  min-width:62px; height:48px; border-radius:12px; color:#fff;
+  font:900 22px/48px 'Inter',sans-serif; text-align:center; letter-spacing:.02em;
+}
+.card h3{font-size:20px; font-weight:900; line-height:48px; letter-spacing:-.01em}
+.card h3 span{font-size:14px; font-weight:600; color:var(--text); margin-left:8px}
+.body{padding:6px 18px 16px; display:flex; gap:14px; align-items:flex-start}
+.ico{width:56px; height:56px; flex:0 0 56px; margin-top:4px}
+.col{flex:1}
+.tools{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:9px}
+.tool{font-size:12.5px; font-weight:700; padding:5px 11px; border-radius:8px; white-space:nowrap}
+.pt{font-size:13.5px; color:var(--text); line-height:1.75; display:flex; gap:7px}
+.pt b{font-weight:900; flex:0 0 auto}
+.action{margin-top:auto; color:#fff; font-size:14px; font-weight:700; padding:11px 18px; text-align:center}
+
+.s1 .num{background:linear-gradient(135deg,var(--s1a),var(--s1b))}
+.s1 .tool{background:#E3EDFE;color:var(--s1a)} .s1 .pt b{color:var(--s1a)}
+.s1 .action{background:linear-gradient(90deg,var(--s1a),var(--s1b))}
+.s2 .num{background:linear-gradient(135deg,var(--s2a),var(--s2b))}
+.s2 .tool{background:#EFEAFB;color:var(--s2a)} .s2 .pt b{color:var(--s2a)}
+.s2 .action{background:linear-gradient(90deg,var(--s2a),var(--s2b))}
+.s3 .num{background:linear-gradient(135deg,var(--s3a),var(--s3b))}
+.s3 .tool{background:#FEEBD9;color:#C2560A} .s3 .pt b{color:var(--s3a)}
+.s3 .action{background:linear-gradient(90deg,var(--s3a),var(--s3b))}
+.s4 .num{background:linear-gradient(135deg,var(--s4a),var(--s4b))}
+.s4 .tool{background:#D9F7EA;color:#047857} .s4 .pt b{color:#047857}
+.s4 .action{background:linear-gradient(90deg,var(--s4a),var(--s4b))}
+
+.phase{
+  grid-column:1/-1; display:flex; align-items:center; gap:12px;
+  font-size:13px; font-weight:900; letter-spacing:.1em; color:var(--text);
+  margin:8px 2px 0;
+}
+.phase::after{content:"";flex:1;height:1px;background:var(--line)}
+.dot{width:10px;height:10px;border-radius:50%}
+
+.laws{
+  grid-column:1/-1; margin-top:18px;
+  background:#fff; border-radius:18px; padding:16px 18px;
+  box-shadow:0 8px 26px rgba(15,23,42,.06);
+}
+.laws h4{font-size:14px; font-weight:900; letter-spacing:.06em; margin-bottom:11px; color:var(--ink)}
+.lawrow{display:flex; flex-wrap:wrap; gap:7px}
+.law{
+  background:#F1F5FB; border:1px solid var(--line); border-radius:9px;
+  padding:6px 12px; font-size:12.5px; font-weight:700; color:#334155;
+}
+.laws p{margin-top:10px; font-size:12.5px; color:var(--text); line-height:1.65}
+
+.warn{
+  grid-column:1/-1; margin-top:16px;
+  background:#FEF2F2; border:1px solid #FECACA; border-left:5px solid #EF4444;
+  border-radius:14px; padding:15px 18px;
+  font-size:13.5px; color:#7F1D1D; line-height:1.8;
+}
+.warn b{color:#B91C1C}
+
+.foot{text-align:center; margin-top:34px}
+.foot .big{
+  font-size:26px; font-weight:900; letter-spacing:-.01em;
+  background:linear-gradient(90deg,var(--s1a),var(--s2a),var(--s3a));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.foot .brand{margin-top:8px; font-size:13.5px; color:var(--text); letter-spacing:.06em}
+
+@media(max-width:780px){
+  .grid{grid-template-columns:1fr}
+  .hero h1{font-size:30px}
+  .bot,.bot2{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <svg class="bot2" width="74" height="84" viewBox="0 0 74 84">
+      <ellipse cx="37" cy="80" rx="22" ry="4" fill="#0F172A" opacity=".08"/>
+      <rect x="16" y="34" width="42" height="40" rx="17" fill="#5B9BFF"/>
+      <circle cx="37" cy="24" r="19" fill="#7FB2FF"/>
+      <ellipse cx="37" cy="25" rx="14" ry="10" fill="#0F172A"/>
+      <circle cx="32" cy="24" r="3.2" fill="#fff"/><circle cx="42" cy="24" r="3.2" fill="#fff"/>
+      <circle cx="12" cy="48" r="7" fill="#5B9BFF"/><circle cx="62" cy="48" r="7" fill="#5B9BFF"/>
+    </svg>
+    <h1>AI Agent 做<span class="hl">法規合規查核</span><br>的 <span class="hl2">8 個步驟</span></h1>
+    <div class="sub">Agent 負責找出風險，判定永遠由專業人員做</div>
+    <div class="chips">
+      <span class="chip">範圍明確</span><span class="chip">條文最新</span>
+      <span class="chip">規則可查</span><span class="chip">風險分級</span>
+      <span class="chip">專業簽核</span>
+    </div>
+    <svg class="bot" width="74" height="84" viewBox="0 0 74 84">
+      <ellipse cx="37" cy="80" rx="22" ry="4" fill="#0F172A" opacity=".08"/>
+      <rect x="16" y="34" width="42" height="40" rx="17" fill="#38BDF8"/>
+      <circle cx="37" cy="24" r="19" fill="#7DD3FC"/>
+      <ellipse cx="37" cy="25" rx="14" ry="10" fill="#0F172A"/>
+      <circle cx="32" cy="24" r="3.2" fill="#fff"/><circle cx="42" cy="24" r="3.2" fill="#fff"/>
+      <circle cx="12" cy="48" r="7" fill="#38BDF8"/><circle cx="62" cy="48" r="7" fill="#38BDF8"/>
+    </svg>
+  </div>
+
+  <div class="grid">
+
+    <div class="phase"><span class="dot" style="background:var(--s1a)"></span>前置理解｜先確定受哪些法規管</div>
+
+    <div class="card s1">
+      <div class="top"><div class="num">01</div><h3>適用界定<span>｜釐清管轄範圍</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M28 6v42M12 48h32" stroke="#2F6FED" stroke-width="3.4" stroke-linecap="round"/><path d="M28 13L13 21l7 9h-14l7-9M28 13l15 8-7 9h14l-7-9" fill="none" stroke="#5B9BFF" stroke-width="2.8" stroke-linejoin="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">AI Agent</span><span class="tool">適用法規清單</span></div>
+          <div class="pt"><b>✓</b><span>產品類別、通路、對象、地區</span></div>
+          <div class="pt"><b>✓</b><span>標的是文案、標示還是合約</span></div>
+        </div>
+      </div>
+      <div class="action">💡 先確定管轄，才知道要比對哪部法</div>
+    </div>
+
+    <div class="card s1">
+      <div class="top"><div class="num">02</div><h3>條文取得<span>｜抓最新版本</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="10" y="7" width="36" height="42" rx="5" fill="none" stroke="#2F6FED" stroke-width="3.2"/><path d="M18 19h20M18 27h20M18 35h13" stroke="#5B9BFF" stroke-width="3" stroke-linecap="round"/><circle cx="43" cy="43" r="9" fill="#2F6FED"/><path d="M39 43l3 3 6-6" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">官方法規資料庫</span><span class="tool">主管機關公告</span></div>
+          <div class="pt"><b>✓</b><span>以官方現行條文為唯一依據</span></div>
+          <div class="pt"><b>✓</b><span>記錄版本、修正日期與施行日</span></div>
+        </div>
+      </div>
+      <div class="action">💡 別靠 AI 記憶背法條，一律現查</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s2a)"></span>規則建置｜把法條變成可檢核清單</div>
+
+    <div class="card s2">
+      <div class="top"><div class="num">03</div><h3>條文拆解<span>｜轉成檢核項目</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="7" y="9" width="18" height="18" rx="4" fill="#9A7CF5"/><rect x="31" y="9" width="18" height="18" rx="4" fill="#C7B4FF"/><rect x="7" y="31" width="18" height="18" rx="4" fill="#C7B4FF"/><rect x="31" y="31" width="18" height="18" rx="4" fill="#6C4CE0"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">AI Agent</span><span class="tool">Checklist 化</span></div>
+          <div class="pt"><b>✓</b><span>一條文拆成可勾選的具體要求</span></div>
+          <div class="pt"><b>✓</b><span>每項標註出處條號，方便回查</span></div>
+        </div>
+      </div>
+      <div class="action">💡 拆得夠細，機器才檢查得動</div>
+    </div>
+
+    <div class="card s2">
+      <div class="top"><div class="num">04</div><h3>規則設定<span>｜定義判斷標準</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M23 8h10l1.5 7 6 3 6.5-3.5 5 8.5-5.5 4.5v7L52 39l-5 8.5-6.5-3.5-6 3L33 54H23l-1.5-7-6-3L9 47.5 4 39l5.5-4.5v-7L4 23l5-8.5 6.5 3.5 6-3z" fill="none" stroke="#6C4CE0" stroke-width="2.8" stroke-linejoin="round" transform="scale(.86) translate(4,3)"/><circle cx="28" cy="28" r="7" fill="#9A7CF5"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">禁用詞庫</span><span class="tool">檢核規則表</span></div>
+          <div class="pt"><b>✓</b><span>禁用字、必要標示、數值上限</span></div>
+          <div class="pt"><b>✓</b><span>規則寫成文件，不靠臨場判斷</span></div>
+        </div>
+      </div>
+      <div class="action">💡 規則先白紙黑字，結果才可重現</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s3a)"></span>掃描產出｜逐項比對與風險分級</div>
+
+    <div class="card s3">
+      <div class="top"><div class="num">05</div><h3>逐項比對<span>｜全文掃描標記</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="10" y="7" width="34" height="42" rx="5" fill="none" stroke="#F97316" stroke-width="3.2"/><path d="M18 18h18M18 26h18" stroke="#FBA94C" stroke-width="3" stroke-linecap="round"/><rect x="17" y="32" width="20" height="6" rx="3" fill="#F97316" opacity=".45"/><path d="M18 40h12" stroke="#FBA94C" stroke-width="3" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">Agent 掃描</span><span class="tool">全文比對</span></div>
+          <div class="pt"><b>✓</b><span>命中處原文標黃，附對應條號</span></div>
+          <div class="pt"><b>✓</b><span>疑似但不確定的另列待確認區</span></div>
+        </div>
+      </div>
+      <div class="action">💡 標記位置與條號，不要只給結論</div>
+    </div>
+
+    <div class="card s3">
+      <div class="top"><div class="num">06</div><h3>風險分級<span>｜排出處理順序</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M28 7l22 40H6z" fill="none" stroke="#F97316" stroke-width="3.4" stroke-linejoin="round"/><path d="M28 22v12" stroke="#F97316" stroke-width="3.6" stroke-linecap="round"/><circle cx="28" cy="40" r="2.6" fill="#F97316"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">風險矩陣</span><span class="tool">條文對應</span></div>
+          <div class="pt"><b>✓</b><span>高／中／低，先處理高風險</span></div>
+          <div class="pt"><b>✓</b><span>寫明依據哪一條，不推測罰則</span></div>
+        </div>
+      </div>
+      <div class="action">💡 分級是排優先序，不是下判決</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s4a)"></span>覆核放行｜專業人員判定才算數</div>
+
+    <div class="card s4">
+      <div class="top"><div class="num">07</div><h3>修改建議<span>｜提出替代寫法</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M36 8l12 12-26 26-14 2 2-14z" fill="none" stroke="#10B981" stroke-width="3.2" stroke-linejoin="round"/><path d="M32 12l12 12" stroke="#4ADE80" stroke-width="3"/><path d="M10 50h38" stroke="#4ADE80" stroke-width="3" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">AI Agent</span><span class="tool">合規語句庫</span></div>
+          <div class="pt"><b>✓</b><span>提供 2～3 種合規替代版本</span></div>
+          <div class="pt"><b>✓</b><span>建議一律標示為草案待確認</span></div>
+        </div>
+      </div>
+      <div class="action">💡 Agent 給選項，不替你決定用哪句</div>
+    </div>
+
+    <div class="card s4">
+      <div class="top"><div class="num">08</div><h3>專業覆核<span>｜人工判定簽核</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="11" y="8" width="34" height="42" rx="4" fill="none" stroke="#10B981" stroke-width="3.2"/><rect x="21" y="4" width="14" height="8" rx="2.5" fill="#10B981"/><path d="M19 26l5 5 11-11" stroke="#4ADE80" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 40h18" stroke="#4ADE80" stroke-width="3.2" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">法務 / 專業人員</span><span class="tool">簽核留痕</span></div>
+          <div class="pt"><b>✓</b><span>逐項判定採納、修改或駁回</span></div>
+          <div class="pt"><b>✓</b><span>版本、依據、簽核紀錄完整留存</span></div>
+        </div>
+      </div>
+      <div class="action">💡 法律責任在人，不在 Agent</div>
+    </div>
+
+    <div class="laws">
+      <h4>📋 常見適用法規範圍（依業別自行確認）</h4>
+      <div class="lawrow">
+        <span class="law">食品安全衛生管理法</span>
+        <span class="law">健康食品管理法</span>
+        <span class="law">食品標示規定</span>
+        <span class="law">藥事法（療效用語）</span>
+        <span class="law">化粧品衛生安全管理法</span>
+        <span class="law">公平交易法（比較廣告）</span>
+        <span class="law">消費者保護法</span>
+        <span class="law">個人資料保護法</span>
+        <span class="law">寵物食品管理相關規定</span>
+      </div>
+      <p>實際適用法規依產品類別、通路與宣稱內容而異，且條文會修正——<b>務必以主管機關現行公告為準</b>。</p>
+    </div>
+
+    <div class="warn">
+      <b>⚠️ 這張卡的界線最重要：Agent 產出的不是法律意見。</b><br>
+      法規會修正，AI 的訓練資料一定會過期，所以第 02 步規定「一律現查官方條文」，
+      第 06 步規定「只標依據、不推測罰則」，第 08 步規定「由法務或專業人員判定並簽核」。<br>
+      本流程用於<b>內部初步自我檢核，協助人把可疑處先挑出來</b>，
+      <b>不取代律師、藥師或主管機關的正式意見</b>；涉及對外宣稱、產品上市或申報時，請務必先取得專業確認。
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <div class="big">用 AI 放大創意・用 Agent 輕鬆執行</div>
+    <div class="brand">AI Coach 益力康陳董｜2026 AI to Agent</div>
+  </div>
+
+</div>
+</body>
+</html>

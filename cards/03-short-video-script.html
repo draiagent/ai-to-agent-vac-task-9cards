@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Agent 寫短影音腳本的 8 個步驟</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+:root{
+  --bg-a:#EAF2FB; --bg-b:#F6F9FD;
+  --ink:#0F172A; --text:#5B6472; --line:#E5E9EF;
+  --s1a:#2F6FED; --s1b:#5B9BFF;
+  --s2a:#6C4CE0; --s2b:#9A7CF5;
+  --s3a:#F97316; --s3b:#FBA94C;
+  --s4a:#10B981; --s4b:#4ADE80;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Noto Sans TC','Inter',sans-serif;
+  background:linear-gradient(170deg,var(--bg-a),var(--bg-b) 45%,#FFF);
+  color:var(--ink); padding:34px 22px 60px;
+}
+.wrap{max-width:1080px;margin:0 auto}
+
+.hero{
+  position:relative; text-align:center; padding:26px 20px 30px;
+  background:linear-gradient(135deg,#DCEAFB,#EEF4FD);
+  border-radius:26px; overflow:hidden; margin-bottom:24px;
+}
+.hero h1{font-size:44px; font-weight:900; letter-spacing:-.02em; line-height:1.2}
+.hero h1 .hl{color:var(--s1a)}
+.hero h1 .hl2{color:var(--s3a)}
+.hero .sub{
+  display:inline-block; margin-top:12px; padding:8px 22px;
+  background:var(--ink); color:#fff; border-radius:999px;
+  font-size:16px; font-weight:700;
+}
+.chips{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:16px}
+.chip{
+  background:#fff; border:1px solid var(--line); border-radius:999px;
+  padding:6px 15px; font-size:13px; font-weight:700; color:var(--s1a);
+}
+.chip:nth-child(2){color:var(--s2a)} .chip:nth-child(3){color:var(--s3a)}
+.chip:nth-child(4){color:var(--s4a)} .chip:nth-child(5){color:#0EA5E9}
+.bot{position:absolute; right:20px; bottom:8px}
+.bot2{position:absolute; left:20px; bottom:8px; transform:scaleX(-1)}
+
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+.card{
+  background:#fff; border-radius:22px; overflow:hidden;
+  box-shadow:0 10px 34px rgba(15,23,42,.07);
+  display:flex; flex-direction:column;
+}
+.card .top{display:flex; align-items:stretch; gap:14px; padding:16px 18px 4px}
+.num{
+  min-width:62px; height:48px; border-radius:12px; color:#fff;
+  font:900 22px/48px 'Inter',sans-serif; text-align:center; letter-spacing:.02em;
+}
+.card h3{font-size:20px; font-weight:900; line-height:48px; letter-spacing:-.01em}
+.card h3 span{font-size:14px; font-weight:600; color:var(--text); margin-left:8px}
+.body{padding:6px 18px 16px; display:flex; gap:14px; align-items:flex-start}
+.ico{width:56px; height:56px; flex:0 0 56px; margin-top:4px}
+.col{flex:1}
+.tools{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:9px}
+.tool{font-size:12.5px; font-weight:700; padding:5px 11px; border-radius:8px; white-space:nowrap}
+.pt{font-size:13.5px; color:var(--text); line-height:1.75; display:flex; gap:7px}
+.pt b{font-weight:900; flex:0 0 auto}
+.action{margin-top:auto; color:#fff; font-size:14px; font-weight:700; padding:11px 18px; text-align:center}
+
+.s1 .num{background:linear-gradient(135deg,var(--s1a),var(--s1b))}
+.s1 .tool{background:#E3EDFE;color:var(--s1a)} .s1 .pt b{color:var(--s1a)}
+.s1 .action{background:linear-gradient(90deg,var(--s1a),var(--s1b))}
+.s2 .num{background:linear-gradient(135deg,var(--s2a),var(--s2b))}
+.s2 .tool{background:#EFEAFB;color:var(--s2a)} .s2 .pt b{color:var(--s2a)}
+.s2 .action{background:linear-gradient(90deg,var(--s2a),var(--s2b))}
+.s3 .num{background:linear-gradient(135deg,var(--s3a),var(--s3b))}
+.s3 .tool{background:#FEEBD9;color:#C2560A} .s3 .pt b{color:var(--s3a)}
+.s3 .action{background:linear-gradient(90deg,var(--s3a),var(--s3b))}
+.s4 .num{background:linear-gradient(135deg,var(--s4a),var(--s4b))}
+.s4 .tool{background:#D9F7EA;color:#047857} .s4 .pt b{color:#047857}
+.s4 .action{background:linear-gradient(90deg,var(--s4a),var(--s4b))}
+
+.phase{
+  grid-column:1/-1; display:flex; align-items:center; gap:12px;
+  font-size:13px; font-weight:900; letter-spacing:.1em; color:var(--text);
+  margin:8px 2px 0;
+}
+.phase::after{content:"";flex:1;height:1px;background:var(--line)}
+.dot{width:10px;height:10px;border-radius:50%}
+
+.foot{text-align:center; margin-top:34px}
+.foot .big{
+  font-size:26px; font-weight:900; letter-spacing:-.01em;
+  background:linear-gradient(90deg,var(--s1a),var(--s2a),var(--s3a));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.foot .brand{margin-top:8px; font-size:13.5px; color:var(--text); letter-spacing:.06em}
+
+@media(max-width:780px){
+  .grid{grid-template-columns:1fr}
+  .hero h1{font-size:30px}
+  .bot,.bot2{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <svg class="bot2" width="74" height="84" viewBox="0 0 74 84">
+      <ellipse cx="37" cy="80" rx="22" ry="4" fill="#0F172A" opacity=".08"/>
+      <rect x="16" y="34" width="42" height="40" rx="17" fill="#5B9BFF"/>
+      <circle cx="37" cy="24" r="19" fill="#7FB2FF"/>
+      <ellipse cx="37" cy="25" rx="14" ry="10" fill="#0F172A"/>
+      <circle cx="32" cy="24" r="3.2" fill="#fff"/><circle cx="42" cy="24" r="3.2" fill="#fff"/>
+      <circle cx="12" cy="48" r="7" fill="#5B9BFF"/><circle cx="62" cy="48" r="7" fill="#5B9BFF"/>
+    </svg>
+    <h1>AI Agent 寫<span class="hl">短影音腳本</span><br>的 <span class="hl2">8 個步驟</span></h1>
+    <div class="sub">前 3 秒抓住人，後 30 秒留住人</div>
+    <div class="chips">
+      <span class="chip">選題精準</span><span class="chip">開場有鉤</span>
+      <span class="chip">乾貨密度</span><span class="chip">節奏明快</span>
+      <span class="chip">合規可發</span>
+    </div>
+    <svg class="bot" width="74" height="84" viewBox="0 0 74 84">
+      <ellipse cx="37" cy="80" rx="22" ry="4" fill="#0F172A" opacity=".08"/>
+      <rect x="16" y="34" width="42" height="40" rx="17" fill="#FBA94C"/>
+      <circle cx="37" cy="24" r="19" fill="#FDC07A"/>
+      <ellipse cx="37" cy="25" rx="14" ry="10" fill="#0F172A"/>
+      <circle cx="32" cy="24" r="3.2" fill="#fff"/><circle cx="42" cy="24" r="3.2" fill="#fff"/>
+      <circle cx="12" cy="48" r="7" fill="#FBA94C"/><circle cx="62" cy="48" r="7" fill="#FBA94C"/>
+    </svg>
+  </div>
+
+  <div class="grid">
+
+    <div class="phase"><span class="dot" style="background:var(--s1a)"></span>前置理解｜先確定拍給誰看</div>
+
+    <div class="card s1">
+      <div class="top"><div class="num">01</div><h3>選題定位<span>｜找出值得拍的題目</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><circle cx="25" cy="25" r="16" fill="none" stroke="#2F6FED" stroke-width="3.4"/><path d="M37 37l11 11" stroke="#2F6FED" stroke-width="3.6" stroke-linecap="round"/><circle cx="25" cy="25" r="6" fill="#5B9BFF"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">AI Agent</span><span class="tool">平台趨勢</span></div>
+          <div class="pt"><b>✓</b><span>觀眾是誰、卡在什麼問題</span></div>
+          <div class="pt"><b>✓</b><span>平台屬性、片長、發布時機</span></div>
+        </div>
+      </div>
+      <div class="action">💡 一支片只解決一個問題</div>
+    </div>
+
+    <div class="card s1">
+      <div class="top"><div class="num">02</div><h3>素材彙整<span>｜蒐集可用內容</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M8 16h16l4 5h20v24a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4z" fill="none" stroke="#2F6FED" stroke-width="3.2" stroke-linejoin="round"/><path d="M18 33h20M18 39h13" stroke="#5B9BFF" stroke-width="3.2" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">後台數據</span><span class="tool">留言 / 提問</span></div>
+          <div class="pt"><b>✓</b><span>過往高互動貼文、常見提問</span></div>
+          <div class="pt"><b>✓</b><span>可引用的研究、案例、數據</span></div>
+        </div>
+      </div>
+      <div class="action">💡 觀眾的留言，就是最好的選題庫</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s2a)"></span>AI 決策｜Agent 幫你排好故事線</div>
+
+    <div class="card s2">
+      <div class="top"><div class="num">03</div><h3>Hook 設計<span>｜前 3 秒定生死</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M30 5L14 31h11l-3 20 18-27H29z" fill="#6C4CE0"/><path d="M46 12l4-4M46 24h6" stroke="#9A7CF5" stroke-width="3" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">AI Agent</span><span class="tool">Hook 句型庫</span></div>
+          <div class="pt"><b>✓</b><span>反常識、提問、痛點直擊</span></div>
+          <div class="pt"><b>✓</b><span>一次生 5 版，挑最強那句</span></div>
+        </div>
+      </div>
+      <div class="action">💡 開場沒鉤子，後面拍再好也沒人看</div>
+    </div>
+
+    <div class="card s2">
+      <div class="top"><div class="num">04</div><h3>結構規劃<span>｜安排內容節奏</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="6" y="9" width="44" height="9" rx="3" fill="#6C4CE0"/><rect x="6" y="23" width="34" height="9" rx="3" fill="#9A7CF5"/><rect x="6" y="37" width="24" height="9" rx="3" fill="#C7B4FF"/><circle cx="47" cy="41" r="6" fill="#6C4CE0"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">AI Agent 決策引擎</span></div>
+          <div class="pt"><b>✓</b><span>Hook → 痛點 → 乾貨 → CTA</span></div>
+          <div class="pt"><b>✓</b><span>每段秒數配置、資訊密度</span></div>
+        </div>
+      </div>
+      <div class="action">💡 讓 Agent 當導演，先排好節奏</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s3a)"></span>產出製作｜把結構變成可拍腳本</div>
+
+    <div class="card s3">
+      <div class="top"><div class="num">05</div><h3>逐字稿生成<span>｜寫出能唸的口白</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M12 8h22l10 10v30a3 3 0 0 1-3 3H12a3 3 0 0 1-3-3V11a3 3 0 0 1 3-3z" fill="none" stroke="#F97316" stroke-width="3.2" stroke-linejoin="round"/><path d="M17 28h22M17 35h22M17 42h14" stroke="#FBA94C" stroke-width="3.2" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">AI Agent</span><span class="tool">口語化設定</span></div>
+          <div class="pt"><b>✓</b><span>短句、去書面語、可以唸得順</span></div>
+          <div class="pt"><b>✓</b><span>語速換算秒數，控制片長</span></div>
+        </div>
+      </div>
+      <div class="action">💡 寫完先唸一次，卡住就是要改</div>
+    </div>
+
+    <div class="card s3">
+      <div class="top"><div class="num">06</div><h3>分鏡字幕<span>｜標好畫面與字卡</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="6" y="11" width="44" height="34" rx="4" fill="none" stroke="#F97316" stroke-width="3.2"/><path d="M6 22h44" stroke="#F97316" stroke-width="3"/><rect x="12" y="29" width="14" height="9" rx="2" fill="#FBA94C"/><path d="M31 31h14M31 37h9" stroke="#FBA94C" stroke-width="3" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">分鏡表</span><span class="tool">SRT 字幕</span></div>
+          <div class="pt"><b>✓</b><span>鏡位、B-roll、畫面提示</span></div>
+          <div class="pt"><b>✓</b><span>字幕斷句、關鍵詞放大</span></div>
+        </div>
+      </div>
+      <div class="action">💡 分鏡標清楚，剪片才不用重想</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s4a)"></span>整合驗收｜發布前的最後把關</div>
+
+    <div class="card s4">
+      <div class="top"><div class="num">07</div><h3>試唸預覽<span>｜先聽過再開拍</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="21" y="7" width="14" height="24" rx="7" fill="#10B981"/><path d="M14 27a14 14 0 0 0 28 0" stroke="#4ADE80" stroke-width="3.4" fill="none" stroke-linecap="round"/><path d="M28 41v8M20 49h16" stroke="#10B981" stroke-width="3.4" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">TTS 引擎</span><span class="tool">計時試唸</span></div>
+          <div class="pt"><b>✓</b><span>實際秒數、停頓、換氣點</span></div>
+          <div class="pt"><b>✓</b><span>拗口的字先改掉再拍</span></div>
+        </div>
+      </div>
+      <div class="action">💡 先聽一遍，省下重拍的時間</div>
+    </div>
+
+    <div class="card s4">
+      <div class="top"><div class="num">08</div><h3>QA 定稿<span>｜確保可以安心發</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="11" y="8" width="34" height="42" rx="4" fill="none" stroke="#10B981" stroke-width="3.2"/><rect x="21" y="4" width="14" height="8" rx="2.5" fill="#10B981"/><path d="M19 26l5 5 11-11" stroke="#4ADE80" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 40h18" stroke="#4ADE80" stroke-width="3.2" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">Agent QA</span><span class="tool">人工核准</span></div>
+          <div class="pt"><b>✓</b><span>數據來源、引用正確性核對</span></div>
+          <div class="pt"><b>✓</b><span>廣告與療效用語合規檢查</span></div>
+        </div>
+      </div>
+      <div class="action">💡 健康類內容，用語一定要人核過</div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <div class="big">用 AI 放大創意・用 Agent 輕鬆執行</div>
+    <div class="brand">AI Coach 益力康陳董｜2026 AI to Agent</div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Agent 做品質 QA 稽核的 8 個步驟</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+:root{
+  --bg-a:#EAF2FB; --bg-b:#F6F9FD;
+  --ink:#0F172A; --text:#5B6472; --line:#E5E9EF;
+  --s1a:#2F6FED; --s1b:#5B9BFF;
+  --s2a:#6C4CE0; --s2b:#9A7CF5;
+  --s3a:#F97316; --s3b:#FBA94C;
+  --s4a:#10B981; --s4b:#4ADE80;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Noto Sans TC','Inter',sans-serif;
+  background:linear-gradient(170deg,var(--bg-a),var(--bg-b) 45%,#FFF);
+  color:var(--ink); padding:34px 22px 60px;
+}
+.wrap{max-width:1080px;margin:0 auto}
+
+.hero{
+  position:relative; text-align:center; padding:26px 20px 30px;
+  background:linear-gradient(135deg,#DCEAFB,#EEF4FD);
+  border-radius:26px; overflow:hidden; margin-bottom:24px;
+}
+.hero h1{font-size:44px; font-weight:900; letter-spacing:-.02em; line-height:1.2}
+.hero h1 .hl{color:var(--s1a)}
+.hero h1 .hl2{color:var(--s3a)}
+.hero .sub{
+  display:inline-block; margin-top:12px; padding:8px 22px;
+  background:var(--ink); color:#fff; border-radius:999px;
+  font-size:16px; font-weight:700;
+}
+.chips{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:16px}
+.chip{
+  background:#fff; border:1px solid var(--line); border-radius:999px;
+  padding:6px 15px; font-size:13px; font-weight:700; color:var(--s1a);
+}
+.chip:nth-child(2){color:var(--s2a)} .chip:nth-child(3){color:var(--s3a)}
+.chip:nth-child(4){color:var(--s4a)} .chip:nth-child(5){color:#0EA5E9}
+.bot{position:absolute; right:20px; bottom:8px}
+.bot2{position:absolute; left:20px; bottom:8px; transform:scaleX(-1)}
+
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+.card{
+  background:#fff; border-radius:22px; overflow:hidden;
+  box-shadow:0 10px 34px rgba(15,23,42,.07);
+  display:flex; flex-direction:column;
+}
+.card .top{display:flex; align-items:stretch; gap:14px; padding:16px 18px 4px}
+.num{
+  min-width:62px; height:48px; border-radius:12px; color:#fff;
+  font:900 22px/48px 'Inter',sans-serif; text-align:center; letter-spacing:.02em;
+}
+.card h3{font-size:20px; font-weight:900; line-height:48px; letter-spacing:-.01em}
+.card h3 span{font-size:14px; font-weight:600; color:var(--text); margin-left:8px}
+.body{padding:6px 18px 16px; display:flex; gap:14px; align-items:flex-start}
+.ico{width:56px; height:56px; flex:0 0 56px; margin-top:4px}
+.col{flex:1}
+.tools{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:9px}
+.tool{font-size:12.5px; font-weight:700; padding:5px 11px; border-radius:8px; white-space:nowrap}
+.pt{font-size:13.5px; color:var(--text); line-height:1.75; display:flex; gap:7px}
+.pt b{font-weight:900; flex:0 0 auto}
+.action{margin-top:auto; color:#fff; font-size:14px; font-weight:700; padding:11px 18px; text-align:center}
+
+.s1 .num{background:linear-gradient(135deg,var(--s1a),var(--s1b))}
+.s1 .tool{background:#E3EDFE;color:var(--s1a)} .s1 .pt b{color:var(--s1a)}
+.s1 .action{background:linear-gradient(90deg,var(--s1a),var(--s1b))}
+.s2 .num{background:linear-gradient(135deg,var(--s2a),var(--s2b))}
+.s2 .tool{background:#EFEAFB;color:var(--s2a)} .s2 .pt b{color:var(--s2a)}
+.s2 .action{background:linear-gradient(90deg,var(--s2a),var(--s2b))}
+.s3 .num{background:linear-gradient(135deg,var(--s3a),var(--s3b))}
+.s3 .tool{background:#FEEBD9;color:#C2560A} .s3 .pt b{color:var(--s3a)}
+.s3 .action{background:linear-gradient(90deg,var(--s3a),var(--s3b))}
+.s4 .num{background:linear-gradient(135deg,var(--s4a),var(--s4b))}
+.s4 .tool{background:#D9F7EA;color:#047857} .s4 .pt b{color:#047857}
+.s4 .action{background:linear-gradient(90deg,var(--s4a),var(--s4b))}
+
+.phase{
+  grid-column:1/-1; display:flex; align-items:center; gap:12px;
+  font-size:13px; font-weight:900; letter-spacing:.1em; color:var(--text);
+  margin:8px 2px 0;
+}
+.phase::after{content:"";flex:1;height:1px;background:var(--line)}
+.dot{width:10px;height:10px;border-radius:50%}
+
+.cmp{
+  grid-column:1/-1; margin-top:18px;
+  background:#fff; border-radius:18px; overflow:hidden;
+  box-shadow:0 8px 26px rgba(15,23,42,.06);
+}
+.cmp h4{
+  font-size:14px; font-weight:900; letter-spacing:.06em;
+  padding:15px 18px 11px; color:var(--ink);
+}
+table{width:100%; border-collapse:collapse}
+th,td{padding:11px 18px; text-align:left; font-size:13px; line-height:1.6}
+th{background:#F1F5FB; font-weight:900; font-size:12.5px; letter-spacing:.04em}
+td{border-top:1px solid var(--line); color:var(--text)}
+td b{color:var(--ink)}
+
+.tip{
+  grid-column:1/-1; margin-top:16px;
+  background:#ECFDF5; border:1px solid #A7F3D0; border-left:5px solid var(--s4a);
+  border-radius:14px; padding:15px 18px;
+  font-size:13.5px; color:#064E3B; line-height:1.8;
+}
+.tip b{color:#047857}
+
+.foot{text-align:center; margin-top:34px}
+.foot .big{
+  font-size:26px; font-weight:900; letter-spacing:-.01em;
+  background:linear-gradient(90deg,var(--s1a),var(--s2a),var(--s3a));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.foot .brand{margin-top:8px; font-size:13.5px; color:var(--text); letter-spacing:.06em}
+
+@media(max-width:780px){
+  .grid{grid-template-columns:1fr}
+  .hero h1{font-size:30px}
+  .bot,.bot2{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <svg class="bot2" width="74" height="84" viewBox="0 0 74 84">
+      <ellipse cx="37" cy="80" rx="22" ry="4" fill="#0F172A" opacity=".08"/>
+      <rect x="16" y="34" width="42" height="40" rx="17" fill="#5B9BFF"/>
+      <circle cx="37" cy="24" r="19" fill="#7FB2FF"/>
+      <ellipse cx="37" cy="25" rx="14" ry="10" fill="#0F172A"/>
+      <circle cx="32" cy="24" r="3.2" fill="#fff"/><circle cx="42" cy="24" r="3.2" fill="#fff"/>
+      <circle cx="12" cy="48" r="7" fill="#5B9BFF"/><circle cx="62" cy="48" r="7" fill="#5B9BFF"/>
+    </svg>
+    <h1>AI Agent 做<span class="hl">品質 QA 稽核</span><br>的 <span class="hl2">8 個步驟</span></h1>
+    <div class="sub">找出缺失只是開始，改完並驗證才算結案</div>
+    <div class="chips">
+      <span class="chip">依據明確</span><span class="chip">判準先定</span>
+      <span class="chip">抽樣不偏</span><span class="chip">缺失有證據</span>
+      <span class="chip">改善可驗證</span>
+    </div>
+    <svg class="bot" width="74" height="84" viewBox="0 0 74 84">
+      <ellipse cx="37" cy="80" rx="22" ry="4" fill="#0F172A" opacity=".08"/>
+      <rect x="16" y="34" width="42" height="40" rx="17" fill="#4ADE80"/>
+      <circle cx="37" cy="24" r="19" fill="#86EFAC"/>
+      <ellipse cx="37" cy="25" rx="14" ry="10" fill="#0F172A"/>
+      <circle cx="32" cy="24" r="3.2" fill="#fff"/><circle cx="42" cy="24" r="3.2" fill="#fff"/>
+      <circle cx="12" cy="48" r="7" fill="#4ADE80"/><circle cx="62" cy="48" r="7" fill="#4ADE80"/>
+    </svg>
+  </div>
+
+  <div class="grid">
+
+    <div class="phase"><span class="dot" style="background:var(--s1a)"></span>前置理解｜先確定要查什麼、依據什麼</div>
+
+    <div class="card s1">
+      <div class="top"><div class="num">01</div><h3>範圍界定<span>｜定義稽核標的</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="8" y="10" width="40" height="36" rx="5" fill="none" stroke="#2F6FED" stroke-width="3.2"/><path d="M8 21h40" stroke="#2F6FED" stroke-width="3"/><rect x="15" y="28" width="12" height="10" rx="2.5" fill="#5B9BFF"/><path d="M33 31h10M33 37h7" stroke="#5B9BFF" stroke-width="3" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">AI Agent</span><span class="tool">稽核計畫</span></div>
+          <div class="pt"><b>✓</b><span>產線、供應商、交付物或流程</span></div>
+          <div class="pt"><b>✓</b><span>定期查核、專案驗收或客訴追查</span></div>
+        </div>
+      </div>
+      <div class="action">💡 目的不同，查的深度就不同</div>
+    </div>
+
+    <div class="card s1">
+      <div class="top"><div class="num">02</div><h3>標準彙整<span>｜找出依據文件</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M8 16h16l4 5h20v24a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4z" fill="none" stroke="#2F6FED" stroke-width="3.2" stroke-linejoin="round"/><path d="M18 33h20M18 39h13" stroke="#5B9BFF" stroke-width="3.2" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">SOP / 規格書</span><span class="tool">客戶驗收標準</span></div>
+          <div class="pt"><b>✓</b><span>內部規範、客戶要求、驗收條件</span></div>
+          <div class="pt"><b>✓</b><span>調閱歷史缺失與重複發生項目</span></div>
+        </div>
+      </div>
+      <div class="action">💡 沒有白紙黑字的標準，就無從稽核</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s2a)"></span>稽核設計｜把標準變成可查的表</div>
+
+    <div class="card s2">
+      <div class="top"><div class="num">03</div><h3>檢核表建置<span>｜設定判定準則</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="9" y="8" width="38" height="42" rx="5" fill="none" stroke="#6C4CE0" stroke-width="3.2"/><path d="M16 19l4 4 7-7" stroke="#9A7CF5" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 33l4 4 7-7" stroke="#9A7CF5" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 21h9M32 35h9" stroke="#6C4CE0" stroke-width="3" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">AI Agent</span><span class="tool">檢核表</span></div>
+          <div class="pt"><b>✓</b><span>每項寫明合格與不合格的界線</span></div>
+          <div class="pt"><b>✓</b><span>模稜兩可的項目先由人定義清楚</span></div>
+        </div>
+      </div>
+      <div class="action">💡 判準先定好，Agent 才不會自己解釋</div>
+    </div>
+
+    <div class="card s2">
+      <div class="top"><div class="num">04</div><h3>抽樣規劃<span>｜決定查哪些樣本</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><circle cx="15" cy="16" r="6" fill="#C7B4FF"/><circle cx="33" cy="14" r="6" fill="#6C4CE0"/><circle cx="45" cy="28" r="6" fill="#C7B4FF"/><circle cx="22" cy="32" r="6" fill="#6C4CE0"/><circle cx="38" cy="44" r="6" fill="#C7B4FF"/><circle cx="14" cy="45" r="6" fill="#9A7CF5"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">抽樣計畫</span><span class="tool">統計方法</span></div>
+          <div class="pt"><b>✓</b><span>樣本數、批次、涵蓋期間先定</span></div>
+          <div class="pt"><b>✓</b><span>隨機或分層抽樣，不挑好的查</span></div>
+        </div>
+      </div>
+      <div class="action">💡 抽樣規則要人訂，別讓 Agent 自選</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s3a)"></span>執行產出｜蒐證比對與缺失分級</div>
+
+    <div class="card s3">
+      <div class="top"><div class="num">05</div><h3>蒐證比對<span>｜逐項對照檢核</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><circle cx="24" cy="24" r="15" fill="none" stroke="#F97316" stroke-width="3.4"/><path d="M35 35l12 12" stroke="#F97316" stroke-width="3.6" stroke-linecap="round"/><path d="M17 24h14M24 17v14" stroke="#FBA94C" stroke-width="3" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">Agent 比對</span><span class="tool">紀錄 / 影像 / Log</span></div>
+          <div class="pt"><b>✓</b><span>作業紀錄、檢驗數據、系統軌跡</span></div>
+          <div class="pt"><b>✓</b><span>每筆發現都附證據與出處</span></div>
+        </div>
+      </div>
+      <div class="action">💡 沒有證據的發現，不能寫成缺失</div>
+    </div>
+
+    <div class="card s3">
+      <div class="top"><div class="num">06</div><h3>缺失分級<span>｜排出處理順序</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="8" y="30" width="11" height="18" rx="3" fill="#FBA94C"/><rect x="23" y="20" width="11" height="28" rx="3" fill="#F97316"/><rect x="38" y="10" width="11" height="38" rx="3" fill="#EA580C"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">缺失分級表</span><span class="tool">條款對應</span></div>
+          <div class="pt"><b>✓</b><span>重大／主要／輕微，先處理重大</span></div>
+          <div class="pt"><b>✓</b><span>標明違反哪一條標準與影響範圍</span></div>
+        </div>
+      </div>
+      <div class="action">💡 分級決定誰要立刻停下來處理</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s4a)"></span>改善結案｜改完要驗證過才算完</div>
+
+    <div class="card s4">
+      <div class="top"><div class="num">07</div><h3>改善追蹤<span>｜對策與負責人</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M12 28a16 16 0 0 1 27-11" stroke="#10B981" stroke-width="3.4" fill="none" stroke-linecap="round"/><path d="M44 28a16 16 0 0 1-27 11" stroke="#4ADE80" stroke-width="3.4" fill="none" stroke-linecap="round"/><path d="M39 8v10h-10M17 48V38h10" stroke="#10B981" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">CAPA 表單</span><span class="tool">任務看板</span></div>
+          <div class="pt"><b>✓</b><span>Agent 提原因假設，現場人員確認</span></div>
+          <div class="pt"><b>✓</b><span>對策、負責人、完成期限缺一不可</span></div>
+        </div>
+      </div>
+      <div class="action">💡 根因由現場判斷，Agent 只給假設</div>
+    </div>
+
+    <div class="card s4">
+      <div class="top"><div class="num">08</div><h3>複核結案<span>｜驗證有效性</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="11" y="8" width="34" height="42" rx="4" fill="none" stroke="#10B981" stroke-width="3.2"/><rect x="21" y="4" width="14" height="8" rx="2.5" fill="#10B981"/><path d="M19 26l5 5 11-11" stroke="#4ADE80" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 40h18" stroke="#4ADE80" stroke-width="3.2" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">有效性驗證</span><span class="tool">主管簽核</span></div>
+          <div class="pt"><b>✓</b><span>用數據證明沒再發生才准結案</span></div>
+          <div class="pt"><b>✓</b><span>重複發生項目回頭修訂 SOP</span></div>
+        </div>
+      </div>
+      <div class="action">💡「已改善」三個字不算，要拿數據</div>
+    </div>
+
+    <div class="cmp">
+      <h4>🔍 兩種查核，別搞混了</h4>
+      <table>
+        <tr><th>　</th><th>07 法規合規查核</th><th>08 品質 QA 稽核</th></tr>
+        <tr><td><b>比對依據</b></td><td>外部法規、主管機關公告</td><td>內部 SOP、規格書、客戶要求</td></tr>
+        <tr><td><b>誰判定</b></td><td>法務或專業人員</td><td>品保主管與現場負責人</td></tr>
+        <tr><td><b>出錯代價</b></td><td>行政處罰、下架、法律責任</td><td>客訴、退貨、重工、失去訂單</td></tr>
+        <tr><td><b>結案條件</b></td><td>專業覆核簽核放行</td><td><b>改善後驗證有效</b>才結案</td></tr>
+      </table>
+    </div>
+
+    <div class="tip">
+      <b>💡 這張卡的重點在最後兩步：</b>多數企業的稽核做到第 06 步就停了——缺失報告寫得很漂亮，
+      但沒人負責、沒期限、沒驗證，下次稽核同樣的問題再出現一次。<br>
+      Agent 很擅長第 03 到 06 步（建表、比對、蒐證、分級），<b>但根因分析要現場人員確認，
+      有效性驗證要用數據說話</b>。把 07、08 設計進流程裡，稽核才會從「找碴」變成「真的變好」。
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <div class="big">用 AI 放大創意・用 Agent 輕鬆執行</div>
+    <div class="brand">AI Coach 益力康陳董｜2026 AI to Agent</div>
+  </div>
+
+</div>
+</body>
+</html>

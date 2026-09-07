@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Agent 做營運數據週報的 8 個步驟</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+:root{
+  --bg-a:#EAF2FB; --bg-b:#F6F9FD;
+  --ink:#0F172A; --text:#5B6472; --line:#E5E9EF;
+  --s1a:#2F6FED; --s1b:#5B9BFF;
+  --s2a:#6C4CE0; --s2b:#9A7CF5;
+  --s3a:#F97316; --s3b:#FBA94C;
+  --s4a:#10B981; --s4b:#4ADE80;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Noto Sans TC','Inter',sans-serif;
+  background:linear-gradient(170deg,var(--bg-a),var(--bg-b) 45%,#FFF);
+  color:var(--ink); padding:34px 22px 60px;
+}
+.wrap{max-width:1080px;margin:0 auto}
+
+.hero{
+  position:relative; text-align:center; padding:26px 20px 30px;
+  background:linear-gradient(135deg,#DCEAFB,#EEF4FD);
+  border-radius:26px; overflow:hidden; margin-bottom:24px;
+}
+.hero h1{font-size:44px; font-weight:900; letter-spacing:-.02em; line-height:1.2}
+.hero h1 .hl{color:var(--s1a)}
+.hero h1 .hl2{color:var(--s3a)}
+.hero .sub{
+  display:inline-block; margin-top:12px; padding:8px 22px;
+  background:var(--ink); color:#fff; border-radius:999px;
+  font-size:16px; font-weight:700;
+}
+.chips{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:16px}
+.chip{
+  background:#fff; border:1px solid var(--line); border-radius:999px;
+  padding:6px 15px; font-size:13px; font-weight:700; color:var(--s1a);
+}
+.chip:nth-child(2){color:var(--s2a)} .chip:nth-child(3){color:var(--s3a)}
+.chip:nth-child(4){color:var(--s4a)} .chip:nth-child(5){color:#0EA5E9}
+.bot{position:absolute; right:20px; bottom:8px}
+.bot2{position:absolute; left:20px; bottom:8px; transform:scaleX(-1)}
+
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+.card{
+  background:#fff; border-radius:22px; overflow:hidden;
+  box-shadow:0 10px 34px rgba(15,23,42,.07);
+  display:flex; flex-direction:column;
+}
+.card .top{display:flex; align-items:stretch; gap:14px; padding:16px 18px 4px}
+.num{
+  min-width:62px; height:48px; border-radius:12px; color:#fff;
+  font:900 22px/48px 'Inter',sans-serif; text-align:center; letter-spacing:.02em;
+}
+.card h3{font-size:20px; font-weight:900; line-height:48px; letter-spacing:-.01em}
+.card h3 span{font-size:14px; font-weight:600; color:var(--text); margin-left:8px}
+.body{padding:6px 18px 16px; display:flex; gap:14px; align-items:flex-start}
+.ico{width:56px; height:56px; flex:0 0 56px; margin-top:4px}
+.col{flex:1}
+.tools{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:9px}
+.tool{font-size:12.5px; font-weight:700; padding:5px 11px; border-radius:8px; white-space:nowrap}
+.pt{font-size:13.5px; color:var(--text); line-height:1.75; display:flex; gap:7px}
+.pt b{font-weight:900; flex:0 0 auto}
+.action{margin-top:auto; color:#fff; font-size:14px; font-weight:700; padding:11px 18px; text-align:center}
+
+.s1 .num{background:linear-gradient(135deg,var(--s1a),var(--s1b))}
+.s1 .tool{background:#E3EDFE;color:var(--s1a)} .s1 .pt b{color:var(--s1a)}
+.s1 .action{background:linear-gradient(90deg,var(--s1a),var(--s1b))}
+.s2 .num{background:linear-gradient(135deg,var(--s2a),var(--s2b))}
+.s2 .tool{background:#EFEAFB;color:var(--s2a)} .s2 .pt b{color:var(--s2a)}
+.s2 .action{background:linear-gradient(90deg,var(--s2a),var(--s2b))}
+.s3 .num{background:linear-gradient(135deg,var(--s3a),var(--s3b))}
+.s3 .tool{background:#FEEBD9;color:#C2560A} .s3 .pt b{color:var(--s3a)}
+.s3 .action{background:linear-gradient(90deg,var(--s3a),var(--s3b))}
+.s4 .num{background:linear-gradient(135deg,var(--s4a),var(--s4b))}
+.s4 .tool{background:#D9F7EA;color:#047857} .s4 .pt b{color:#047857}
+.s4 .action{background:linear-gradient(90deg,var(--s4a),var(--s4b))}
+
+.phase{
+  grid-column:1/-1; display:flex; align-items:center; gap:12px;
+  font-size:13px; font-weight:900; letter-spacing:.1em; color:var(--text);
+  margin:8px 2px 0;
+}
+.phase::after{content:"";flex:1;height:1px;background:var(--line)}
+.dot{width:10px;height:10px;border-radius:50%}
+
+.tip{
+  grid-column:1/-1; margin-top:18px;
+  background:#EFF6FF; border:1px solid #BFDBFE; border-left:5px solid #2F6FED;
+  border-radius:14px; padding:14px 18px;
+  font-size:13.5px; color:#1E3A5F; line-height:1.75;
+}
+.tip b{color:#1D4ED8}
+
+.foot{text-align:center; margin-top:34px}
+.foot .big{
+  font-size:26px; font-weight:900; letter-spacing:-.01em;
+  background:linear-gradient(90deg,var(--s1a),var(--s2a),var(--s3a));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.foot .brand{margin-top:8px; font-size:13.5px; color:var(--text); letter-spacing:.06em}
+
+@media(max-width:780px){
+  .grid{grid-template-columns:1fr}
+  .hero h1{font-size:30px}
+  .bot,.bot2{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <svg class="bot2" width="74" height="84" viewBox="0 0 74 84">
+      <ellipse cx="37" cy="80" rx="22" ry="4" fill="#0F172A" opacity=".08"/>
+      <rect x="16" y="34" width="42" height="40" rx="17" fill="#5B9BFF"/>
+      <circle cx="37" cy="24" r="19" fill="#7FB2FF"/>
+      <ellipse cx="37" cy="25" rx="14" ry="10" fill="#0F172A"/>
+      <circle cx="32" cy="24" r="3.2" fill="#fff"/><circle cx="42" cy="24" r="3.2" fill="#fff"/>
+      <circle cx="12" cy="48" r="7" fill="#5B9BFF"/><circle cx="62" cy="48" r="7" fill="#5B9BFF"/>
+    </svg>
+    <h1>AI Agent 做<span class="hl">營運數據週報</span><br>的 <span class="hl2">8 個步驟</span></h1>
+    <div class="sub">每週自動跑，看完就知道下週該做什麼</div>
+    <div class="chips">
+      <span class="chip">指標精簡</span><span class="chip">口徑一致</span>
+      <span class="chip">異常有警示</span><span class="chip">結論一句話</span>
+      <span class="chip">行動有人接</span>
+    </div>
+    <svg class="bot" width="74" height="84" viewBox="0 0 74 84">
+      <ellipse cx="37" cy="80" rx="22" ry="4" fill="#0F172A" opacity=".08"/>
+      <rect x="16" y="34" width="42" height="40" rx="17" fill="#9A7CF5"/>
+      <circle cx="37" cy="24" r="19" fill="#B79BFF"/>
+      <ellipse cx="37" cy="25" rx="14" ry="10" fill="#0F172A"/>
+      <circle cx="32" cy="24" r="3.2" fill="#fff"/><circle cx="42" cy="24" r="3.2" fill="#fff"/>
+      <circle cx="12" cy="48" r="7" fill="#9A7CF5"/><circle cx="62" cy="48" r="7" fill="#9A7CF5"/>
+    </svg>
+  </div>
+
+  <div class="grid">
+
+    <div class="phase"><span class="dot" style="background:var(--s1a)"></span>前置理解｜先確定這週要盯哪幾個數</div>
+
+    <div class="card s1">
+      <div class="top"><div class="num">01</div><h3>指標定義<span>｜挑出關鍵少數</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><circle cx="28" cy="28" r="21" fill="none" stroke="#2F6FED" stroke-width="3.2"/><circle cx="28" cy="28" r="12" fill="none" stroke="#5B9BFF" stroke-width="3"/><circle cx="28" cy="28" r="4.5" fill="#2F6FED"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">AI Agent</span><span class="tool">指標字典</span></div>
+          <div class="pt"><b>✓</b><span>1 個北極星 + 3～5 個支撐指標</span></div>
+          <div class="pt"><b>✓</b><span>每個指標寫清楚計算口徑</span></div>
+        </div>
+      </div>
+      <div class="action">💡 指標越少，週報越有人看</div>
+    </div>
+
+    <div class="card s1">
+      <div class="top"><div class="num">02</div><h3>資料串接<span>｜接上各系統後台</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><circle cx="12" cy="14" r="6" fill="#5B9BFF"/><circle cx="12" cy="42" r="6" fill="#5B9BFF"/><circle cx="12" cy="28" r="6" fill="#5B9BFF"/><rect x="34" y="18" width="18" height="20" rx="4" fill="none" stroke="#2F6FED" stroke-width="3.2"/><path d="M18 14h10v12h6M18 28h16M18 42h10V30h6" stroke="#2F6FED" stroke-width="2.8" fill="none"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">POS / 電商後台</span><span class="tool">CRM / GA</span></div>
+          <div class="pt"><b>✓</b><span>來客、訂單、客單價、流量</span></div>
+          <div class="pt"><b>✓</b><span>唯讀連線、固定時間抓取</span></div>
+        </div>
+      </div>
+      <div class="action">💡 資料自動抓，不要每週手動貼</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s2a)"></span>資料處理｜把跨系統的數字對齊</div>
+
+    <div class="card s2">
+      <div class="top"><div class="num">03</div><h3>資料整併<span>｜統一口徑與時區</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><circle cx="21" cy="28" r="14" fill="#9A7CF5" opacity=".55"/><circle cx="35" cy="28" r="14" fill="#6C4CE0" opacity=".55"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">pandas</span><span class="tool">口徑對照表</span></div>
+          <div class="pt"><b>✓</b><span>跨通路去重、統一週期起訖</span></div>
+          <div class="pt"><b>✓</b><span>缺漏補值規則寫死不臨時決定</span></div>
+        </div>
+      </div>
+      <div class="action">💡 口徑一致，比小數點精準更重要</div>
+    </div>
+
+    <div class="card s2">
+      <div class="top"><div class="num">04</div><h3>週期比對<span>｜算出變化幅度</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="8" y="24" width="12" height="24" rx="3" fill="#C7B4FF"/><rect x="24" y="14" width="12" height="34" rx="3" fill="#9A7CF5"/><rect x="40" y="30" width="9" height="18" rx="3" fill="#6C4CE0"/><path d="M14 18l8-8 8 6" stroke="#6C4CE0" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">pandas</span><span class="tool">WoW / 達成率</span></div>
+          <div class="pt"><b>✓</b><span>對比上週、去年同期、目標值</span></div>
+          <div class="pt"><b>✓</b><span>用百分比與絕對值同時呈現</span></div>
+        </div>
+      </div>
+      <div class="action">💡 只給數字沒有比較，等於沒說</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s3a)"></span>分析產出｜找出訊號、寫成人話</div>
+
+    <div class="card s3">
+      <div class="top"><div class="num">05</div><h3>異常偵測<span>｜自動亮紅燈</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M28 7l22 40H6z" fill="none" stroke="#F97316" stroke-width="3.4" stroke-linejoin="round"/><path d="M28 22v12" stroke="#F97316" stroke-width="3.6" stroke-linecap="round"/><circle cx="28" cy="40" r="2.6" fill="#F97316"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">AI Agent</span><span class="tool">門檻告警</span></div>
+          <div class="pt"><b>✓</b><span>超出門檻自動標記紅／黃燈</span></div>
+          <div class="pt"><b>✓</b><span>只提示異常，不自行推斷原因</span></div>
+        </div>
+      </div>
+      <div class="action">💡 沒異常就別發長篇，省大家時間</div>
+    </div>
+
+    <div class="card s3">
+      <div class="top"><div class="num">06</div><h3>洞察摘要<span>｜三句話講完</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M28 6a16 16 0 0 0-9 29v6h18v-6a16 16 0 0 0-9-29z" fill="none" stroke="#F97316" stroke-width="3.2" stroke-linejoin="round"/><path d="M21 47h14M23 51h10" stroke="#FBA94C" stroke-width="3" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">AI Agent</span><span class="tool">摘要模板</span></div>
+          <div class="pt"><b>✓</b><span>好消息、壞消息、要注意的事</span></div>
+          <div class="pt"><b>✓</b><span>圖表放後面，結論放最前面</span></div>
+        </div>
+      </div>
+      <div class="action">💡 主管只看前三行，把重點放最上面</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s4a)"></span>推播行動｜看完要有人動起來</div>
+
+    <div class="card s4">
+      <div class="top"><div class="num">07</div><h3>排程推播<span>｜固定時間送達</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><circle cx="28" cy="28" r="20" fill="none" stroke="#10B981" stroke-width="3.2"/><path d="M28 15v14l9 6" stroke="#10B981" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="45" cy="12" r="6" fill="#4ADE80"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">排程 Cron</span><span class="tool">Slack / Notion</span></div>
+          <div class="pt"><b>✓</b><span>每週固定時間自動送出</span></div>
+          <div class="pt"><b>✓</b><span>推播摘要＋附完整報表連結</span></div>
+        </div>
+      </div>
+      <div class="action">💡 固定時間收到，才會養成看的習慣</div>
+    </div>
+
+    <div class="card s4">
+      <div class="top"><div class="num">08</div><h3>行動追蹤<span>｜下週回頭驗收</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="8" y="12" width="40" height="34" rx="5" fill="none" stroke="#10B981" stroke-width="3.2"/><path d="M15 22l4 4 7-7" stroke="#4ADE80" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 36l4 4 7-7" stroke="#4ADE80" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 24h10M32 38h10" stroke="#10B981" stroke-width="3" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">任務看板</span><span class="tool">負責人指派</span></div>
+          <div class="pt"><b>✓</b><span>每個紅燈指派一位負責人</span></div>
+          <div class="pt"><b>✓</b><span>下週報表開頭先驗收上週行動</span></div>
+        </div>
+      </div>
+      <div class="action">💡 沒人負責的週報，發再多也沒用</div>
+    </div>
+
+    <div class="tip">
+      <b>💡 週報 vs 月報，差別在目的：</b>月報是<b>對外負責</b>，要精準、要簽核、要能追到憑證；
+      週報是<b>對內行動</b>，要快、要少、要有人接手。所以週報別追求小數點對齊，
+      <b>口徑一致、趨勢正確、有人負責</b>就夠了——真正的失敗不是算錯 0.5%，而是<b>發出去沒人看、沒人動</b>。
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <div class="big">用 AI 放大創意・用 Agent 輕鬆執行</div>
+    <div class="brand">AI Coach 益力康陳董｜2026 AI to Agent</div>
+  </div>
+
+</div>
+</body>
+</html>

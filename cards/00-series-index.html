@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Agent 企業應用地圖｜系列總覽</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+:root{
+  --bg-a:#EAF2FB; --bg-b:#F6F9FD;
+  --ink:#0F172A; --text:#5B6472; --line:#E5E9EF;
+  --s1a:#2F6FED; --s1b:#5B9BFF;
+  --s2a:#6C4CE0; --s2b:#9A7CF5;
+  --s3a:#F97316; --s3b:#FBA94C;
+  --s4a:#10B981; --s4b:#4ADE80;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Noto Sans TC','Inter',sans-serif;
+  background:linear-gradient(170deg,var(--bg-a),var(--bg-b) 45%,#FFF);
+  color:var(--ink); padding:34px 22px 60px;
+}
+.wrap{max-width:1080px;margin:0 auto}
+
+/* ── Hero ── */
+.hero{
+  position:relative; text-align:center; padding:28px 20px 32px;
+  background:linear-gradient(135deg,#DCEAFB,#EEF4FD);
+  border-radius:26px; overflow:hidden; margin-bottom:26px;
+}
+.hero .kicker{
+  font-size:13px; font-weight:900; letter-spacing:.22em; color:var(--s1a);
+  margin-bottom:10px;
+}
+.hero h1{font-size:44px; font-weight:900; letter-spacing:-.02em; line-height:1.2}
+.hero h1 .hl{color:var(--s1a)}
+.hero h1 .hl2{color:var(--s3a)}
+.hero .sub{
+  display:inline-block; margin-top:14px; padding:8px 22px;
+  background:var(--ink); color:#fff; border-radius:999px;
+  font-size:16px; font-weight:700;
+}
+.bot{position:absolute; right:20px; bottom:8px}
+.bot2{position:absolute; left:20px; bottom:8px; transform:scaleX(-1)}
+
+/* ── Section head ── */
+.sec{
+  display:flex; align-items:center; gap:12px;
+  font-size:14px; font-weight:900; letter-spacing:.12em; color:var(--text);
+  margin:30px 2px 14px;
+}
+.sec::after{content:"";flex:1;height:1px;background:var(--line)}
+.dot{width:11px;height:11px;border-radius:50%}
+
+/* ── 通用骨架 ── */
+.spine{
+  background:#fff; border-radius:22px; padding:22px 20px 20px;
+  box-shadow:0 10px 34px rgba(15,23,42,.07);
+}
+.spine .lead{
+  font-size:14px; color:var(--text); line-height:1.7; margin-bottom:18px;
+}
+.spine .lead b{color:var(--ink)}
+.steps{display:grid; grid-template-columns:repeat(4,1fr); gap:12px}
+.stp{border-radius:14px; padding:13px 14px; color:#fff}
+.stp .ph{font-size:11px; font-weight:900; letter-spacing:.1em; opacity:.9}
+.stp .no{font:900 15px/1.4 'Inter',sans-serif; margin-top:4px}
+.stp .nm{font-size:13px; font-weight:700; line-height:1.55; margin-top:3px}
+.p1{background:linear-gradient(135deg,var(--s1a),var(--s1b))}
+.p2{background:linear-gradient(135deg,var(--s2a),var(--s2b))}
+.p3{background:linear-gradient(135deg,var(--s3a),var(--s3b))}
+.p4{background:linear-gradient(135deg,var(--s4a),var(--s4b))}
+
+/* ── 類型群組 ── */
+.group{
+  background:#fff; border-radius:22px; overflow:hidden;
+  box-shadow:0 10px 34px rgba(15,23,42,.07); margin-bottom:18px;
+}
+.ghead{padding:16px 20px 12px; display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+.tag{
+  color:#fff; font-size:12.5px; font-weight:900; letter-spacing:.06em;
+  padding:6px 13px; border-radius:9px;
+}
+.ghead h3{font-size:19px; font-weight:900; letter-spacing:-.01em}
+.ghead .risk{
+  margin-left:auto; font-size:12.5px; font-weight:700;
+  padding:5px 12px; border-radius:8px;
+}
+.items{padding:2px 20px 18px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px}
+.item{
+  border:1px solid var(--line); border-radius:14px; padding:13px 14px;
+  display:flex; flex-direction:column; gap:5px;
+}
+.item .id{font:900 14px/1 'Inter',sans-serif}
+.item .ti{font-size:15px; font-weight:900; letter-spacing:-.01em}
+.item .de{font-size:12.5px; color:var(--text); line-height:1.6}
+.two-col .items{grid-template-columns:1fr 1fr}
+.one-col .items{grid-template-columns:1fr}
+.item.soon{border-style:dashed; opacity:.62}
+.item.soon .ti{color:var(--text)}
+
+.gA .tag{background:linear-gradient(135deg,var(--s3a),var(--s3b))}
+.gA .risk{background:#FEEBD9;color:#C2560A}
+.gA .item .id{color:var(--s3a)}
+.gB .tag{background:linear-gradient(135deg,var(--s2a),var(--s2b))}
+.gB .risk{background:#EFEAFB;color:var(--s2a)}
+.gB .item .id{color:var(--s2a)}
+.gC .tag{background:linear-gradient(135deg,var(--s1a),var(--s1b))}
+.gC .risk{background:#E3EDFE;color:var(--s1a)}
+.gC .item .id{color:var(--s1a)}
+.gD .tag{background:linear-gradient(135deg,var(--s4a),var(--s4b))}
+.gD .risk{background:#D9F7EA;color:#047857}
+.gD .item .id{color:#047857}
+
+/* ── 風險對照 ── */
+.tbl{
+  background:#fff; border-radius:22px; overflow:hidden;
+  box-shadow:0 10px 34px rgba(15,23,42,.07);
+}
+table{width:100%; border-collapse:collapse}
+th,td{padding:13px 16px; text-align:left; font-size:13.5px; line-height:1.6}
+th{background:#F1F5FB; font-weight:900; font-size:13px; letter-spacing:.04em}
+td{border-top:1px solid var(--line); color:var(--text)}
+td b{color:var(--ink)}
+
+.note{
+  margin-top:20px;
+  background:#EFF6FF; border:1px solid #BFDBFE; border-left:5px solid var(--s1a);
+  border-radius:14px; padding:15px 18px;
+  font-size:13.5px; color:#1E3A5F; line-height:1.8;
+}
+.note b{color:#1D4ED8}
+
+.foot{text-align:center; margin-top:34px}
+.foot .big{
+  font-size:26px; font-weight:900; letter-spacing:-.01em;
+  background:linear-gradient(90deg,var(--s1a),var(--s2a),var(--s3a));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.foot .brand{margin-top:8px; font-size:13.5px; color:var(--text); letter-spacing:.06em}
+
+@media(max-width:820px){
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .items{grid-template-columns:1fr}
+  .hero h1{font-size:30px}
+  .bot,.bot2{display:none}
+  .ghead .risk{margin-left:0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <svg class="bot2" width="74" height="84" viewBox="0 0 74 84">
+      <ellipse cx="37" cy="80" rx="22" ry="4" fill="#0F172A" opacity=".08"/>
+      <rect x="16" y="34" width="42" height="40" rx="17" fill="#5B9BFF"/>
+      <circle cx="37" cy="24" r="19" fill="#7FB2FF"/>
+      <ellipse cx="37" cy="25" rx="14" ry="10" fill="#0F172A"/>
+      <circle cx="32" cy="24" r="3.2" fill="#fff"/><circle cx="42" cy="24" r="3.2" fill="#fff"/>
+      <circle cx="12" cy="48" r="7" fill="#5B9BFF"/><circle cx="62" cy="48" r="7" fill="#5B9BFF"/>
+    </svg>
+    <div class="kicker">SERIES INDEX ・ 系列總覽</div>
+    <h1>企業導入 <span class="hl">AI Agent</span><br>的 <span class="hl2">任務地圖</span></h1>
+    <div class="sub">9 種任務・1 套 8 步驟骨架・4 大類型</div>
+    <svg class="bot" width="74" height="84" viewBox="0 0 74 84">
+      <ellipse cx="37" cy="80" rx="22" ry="4" fill="#0F172A" opacity=".08"/>
+      <rect x="16" y="34" width="42" height="40" rx="17" fill="#FBA94C"/>
+      <circle cx="37" cy="24" r="19" fill="#FDC07A"/>
+      <ellipse cx="37" cy="25" rx="14" ry="10" fill="#0F172A"/>
+      <circle cx="32" cy="24" r="3.2" fill="#fff"/><circle cx="42" cy="24" r="3.2" fill="#fff"/>
+      <circle cx="12" cy="48" r="7" fill="#FBA94C"/><circle cx="62" cy="48" r="7" fill="#FBA94C"/>
+    </svg>
+  </div>
+
+  <!-- 通用骨架 -->
+  <div class="sec"><span class="dot" style="background:var(--s1a)"></span>共通骨架｜為什麼每張卡都是 8 步</div>
+  <div class="spine">
+    <div class="lead">
+      不管是剪影片、做簡報、跑報表還是查競品，Agent 的工作邏輯其實<b>完全一樣</b>——
+      <b>先理解、再決策、後產出、最後把關</b>。換的只是工具與產出物，骨架不變。
+      這就是為什麼一套流程學會，可以套進公司裡的每一個部門。
+    </div>
+    <div class="steps">
+      <div class="stp p1"><div class="ph">PHASE 1</div><div class="no">01 – 02</div><div class="nm">前置理解<br>搞懂要做給誰、有什麼料</div></div>
+      <div class="stp p2"><div class="ph">PHASE 2</div><div class="no">03 – 04</div><div class="nm">決策／處理<br>排結構、對齊資料</div></div>
+      <div class="stp p3"><div class="ph">PHASE 3</div><div class="no">05 – 06</div><div class="nm">產出製作<br>生成內容與視覺</div></div>
+      <div class="stp p4"><div class="ph">PHASE 4</div><div class="no">07 – 08</div><div class="nm">整合驗收<br>預覽、把關、人工核准</div></div>
+    </div>
+  </div>
+
+  <!-- 三大類型 -->
+  <div class="sec"><span class="dot" style="background:var(--s3a)"></span>任務分類｜企業導入 AI 的三種主戰場</div>
+
+  <div class="group gA">
+    <div class="ghead">
+      <span class="tag">類型 A</span>
+      <h3>內容生成型</h3>
+      <span class="risk">風險：品質與合規用語</span>
+    </div>
+    <div class="items">
+      <div class="item"><span class="id">01</span><span class="ti">剪影片</span><span class="de">素材解析 → 語音理解 → 剪輯決策 → QA 定稿</span></div>
+      <div class="item"><span class="id">02</span><span class="ti">行銷簡報</span><span class="de">需求定義 → 敘事架構 → 文案圖表 → 組裝覆核</span></div>
+      <div class="item"><span class="id">03</span><span class="ti">短影音腳本</span><span class="de">選題定位 → Hook 設計 → 分鏡字幕 → 合規檢查</span></div>
+    </div>
+  </div>
+
+  <div class="group gB two-col">
+    <div class="ghead">
+      <span class="tag">類型 B</span>
+      <h3>數據彙整型</h3>
+      <span class="risk">風險：數字正確與行動落地</span>
+    </div>
+    <div class="items">
+      <div class="item"><span class="id">04</span><span class="ti">財務月報表</span><span class="de">資料串接 → 清洗計算 → 差異分析 → 覆核簽名</span></div>
+      <div class="item"><span class="id">05</span><span class="ti">營運數據週報</span><span class="de">指標定義 → 週期比對 → 異常偵測 → 行動追蹤</span></div>
+      
+    </div>
+  </div>
+
+  <div class="group gC">
+    <div class="ghead">
+      <span class="tag">類型 C</span>
+      <h3>檢索稽核型</h3>
+      <span class="risk">風險：來源真實性與判定越權</span>
+    </div>
+    <div class="items">
+      <div class="item"><span class="id">06</span><span class="ti">競品分析</span><span class="de">範圍界定 → 廣度蒐集 → 來源驗證 → 人工判讀</span></div>
+      <div class="item"><span class="id">07</span><span class="ti">法規合規查核</span><span class="de">適用界定 → 條文取得 → 逐項比對 → 專業覆核</span></div>
+      <div class="item"><span class="id">08</span><span class="ti">品質 QA 稽核</span><span class="de">標準彙整 → 抽樣規劃 → 缺失分級 → 複核結案</span></div>
+    </div>
+  </div>
+
+  <div class="group gD one-col">
+    <div class="ghead">
+      <span class="tag">類型 D</span>
+      <h3>研發探索型</h3>
+      <span class="risk">風險：最高，僅能輔助</span>
+    </div>
+    <div class="items">
+      <div class="item"><span class="id">09</span><span class="ti">研究配方輔助</span><span class="de">法規框定 → 證據分級 → 風險預檢 → 專業定案</span></div>
+    </div>
+  </div>
+
+  <!-- 風險對照 -->
+  <div class="sec"><span class="dot" style="background:var(--s4a)"></span>導入判斷｜Agent 該做到哪裡就停</div>
+  <div class="tbl">
+    <table>
+      <tr><th>任務類型</th><th>Agent 負責</th><th>人一定要接手的地方</th></tr>
+      <tr><td><b>內容生成型</b></td><td>發想、草稿、套版、大量產出</td><td>品牌調性、療效與廣告用語把關</td></tr>
+      <tr><td><b>數據彙整型</b></td><td>取數、計算、比對、標記異常</td><td><b>歸因判斷</b>與對外數字的簽核</td></tr>
+      <tr><td><b>知識檢索型</b></td><td>廣度蒐集、交叉比對、整理成表</td><td><b>來源查證</b>與結論可信度判讀</td></tr>
+      <tr><td><b>研發探索型</b></td><td>文獻檢索、候選組合、風險提示</td><td><b>最終配方決策</b>、實驗與法規驗證</td></tr>
+    </table>
+  </div>
+
+  <div class="note">
+    <b>💡 一句話總結整個系列：</b>Agent 越往下走越不能自己做決定。
+    內容型可以讓它端到端跑完，數據型要人做歸因，檢索型要人查來源，研發型只能當助手。
+    <b>導入 AI 的成敗，不在於 Agent 能做多少，而在於你有沒有把「人該接手的那一步」設計進流程裡。</b>
+  </div>
+
+  <div class="foot">
+    <div class="big">用 AI 放大創意・用 Agent 輕鬆執行</div>
+    <div class="brand">AI Coach 益力康陳董｜2026 AI to Agent</div>
+  </div>
+
+</div>
+</body>
+</html>

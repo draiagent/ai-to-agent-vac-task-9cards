@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Agent 輔助研究配方的 8 個步驟</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+:root{
+  --bg-a:#EAF2FB; --bg-b:#F6F9FD;
+  --ink:#0F172A; --text:#5B6472; --line:#E5E9EF;
+  --s1a:#2F6FED; --s1b:#5B9BFF;
+  --s2a:#6C4CE0; --s2b:#9A7CF5;
+  --s3a:#F97316; --s3b:#FBA94C;
+  --s4a:#10B981; --s4b:#4ADE80;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Noto Sans TC','Inter',sans-serif;
+  background:linear-gradient(170deg,var(--bg-a),var(--bg-b) 45%,#FFF);
+  color:var(--ink); padding:34px 22px 60px;
+}
+.wrap{max-width:1080px;margin:0 auto}
+
+.hero{
+  position:relative; text-align:center; padding:26px 20px 30px;
+  background:linear-gradient(135deg,#DCEAFB,#EEF4FD);
+  border-radius:26px; overflow:hidden; margin-bottom:16px;
+}
+.hero h1{font-size:44px; font-weight:900; letter-spacing:-.02em; line-height:1.2}
+.hero h1 .hl{color:var(--s1a)}
+.hero h1 .hl2{color:var(--s3a)}
+.hero .sub{
+  display:inline-block; margin-top:12px; padding:8px 22px;
+  background:var(--ink); color:#fff; border-radius:999px;
+  font-size:16px; font-weight:700;
+}
+.chips{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:16px}
+.chip{
+  background:#fff; border:1px solid var(--line); border-radius:999px;
+  padding:6px 15px; font-size:13px; font-weight:700; color:var(--s1a);
+}
+.chip:nth-child(2){color:var(--s2a)} .chip:nth-child(3){color:var(--s3a)}
+.chip:nth-child(4){color:var(--s4a)} .chip:nth-child(5){color:#0EA5E9}
+.bot{position:absolute; right:20px; bottom:8px}
+.bot2{position:absolute; left:20px; bottom:8px; transform:scaleX(-1)}
+
+/* 置頂界線宣告 */
+.topwarn{
+  background:#FEF2F2; border:2px solid #FCA5A5; border-radius:18px;
+  padding:16px 20px; margin-bottom:24px;
+  font-size:14px; color:#7F1D1D; line-height:1.8; text-align:center;
+}
+.topwarn b{color:#B91C1C; font-weight:900}
+
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+.card{
+  background:#fff; border-radius:22px; overflow:hidden;
+  box-shadow:0 10px 34px rgba(15,23,42,.07);
+  display:flex; flex-direction:column;
+}
+.card .top{display:flex; align-items:stretch; gap:14px; padding:16px 18px 4px}
+.num{
+  min-width:62px; height:48px; border-radius:12px; color:#fff;
+  font:900 22px/48px 'Inter',sans-serif; text-align:center; letter-spacing:.02em;
+}
+.card h3{font-size:20px; font-weight:900; line-height:48px; letter-spacing:-.01em}
+.card h3 span{font-size:14px; font-weight:600; color:var(--text); margin-left:8px}
+.body{padding:6px 18px 16px; display:flex; gap:14px; align-items:flex-start}
+.ico{width:56px; height:56px; flex:0 0 56px; margin-top:4px}
+.col{flex:1}
+.tools{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:9px}
+.tool{font-size:12.5px; font-weight:700; padding:5px 11px; border-radius:8px; white-space:nowrap}
+.pt{font-size:13.5px; color:var(--text); line-height:1.75; display:flex; gap:7px}
+.pt b{font-weight:900; flex:0 0 auto}
+.action{margin-top:auto; color:#fff; font-size:14px; font-weight:700; padding:11px 18px; text-align:center}
+
+.s1 .num{background:linear-gradient(135deg,var(--s1a),var(--s1b))}
+.s1 .tool{background:#E3EDFE;color:var(--s1a)} .s1 .pt b{color:var(--s1a)}
+.s1 .action{background:linear-gradient(90deg,var(--s1a),var(--s1b))}
+.s2 .num{background:linear-gradient(135deg,var(--s2a),var(--s2b))}
+.s2 .tool{background:#EFEAFB;color:var(--s2a)} .s2 .pt b{color:var(--s2a)}
+.s2 .action{background:linear-gradient(90deg,var(--s2a),var(--s2b))}
+.s3 .num{background:linear-gradient(135deg,var(--s3a),var(--s3b))}
+.s3 .tool{background:#FEEBD9;color:#C2560A} .s3 .pt b{color:var(--s3a)}
+.s3 .action{background:linear-gradient(90deg,var(--s3a),var(--s3b))}
+.s4 .num{background:linear-gradient(135deg,var(--s4a),var(--s4b))}
+.s4 .tool{background:#D9F7EA;color:#047857} .s4 .pt b{color:#047857}
+.s4 .action{background:linear-gradient(90deg,var(--s4a),var(--s4b))}
+
+.phase{
+  grid-column:1/-1; display:flex; align-items:center; gap:12px;
+  font-size:13px; font-weight:900; letter-spacing:.1em; color:var(--text);
+  margin:8px 2px 0;
+}
+.phase::after{content:"";flex:1;height:1px;background:var(--line)}
+.dot{width:10px;height:10px;border-radius:50%}
+
+/* 禁區清單 */
+.nogo{
+  grid-column:1/-1; margin-top:18px;
+  background:#fff; border-radius:18px; overflow:hidden;
+  box-shadow:0 8px 26px rgba(15,23,42,.06);
+  border-top:5px solid #EF4444;
+}
+.nogo h4{font-size:15px; font-weight:900; padding:16px 20px 4px; color:#B91C1C}
+.nogo .two{display:grid; grid-template-columns:1fr 1fr; gap:0}
+.nogo .side{padding:12px 20px 18px}
+.nogo .side h5{
+  font-size:13px; font-weight:900; letter-spacing:.06em;
+  margin-bottom:9px; color:var(--ink);
+}
+.nogo ul{list-style:none}
+.nogo li{
+  font-size:13px; line-height:1.7; color:var(--text);
+  display:flex; gap:8px; margin-bottom:5px;
+}
+.nogo li span{flex:0 0 auto; font-weight:900}
+.can li span{color:#047857}
+.cant li span{color:#B91C1C}
+.cant{background:#FEF2F2}
+
+.warn{
+  grid-column:1/-1; margin-top:16px;
+  background:#FEF2F2; border:1px solid #FECACA; border-left:5px solid #EF4444;
+  border-radius:14px; padding:15px 18px;
+  font-size:13.5px; color:#7F1D1D; line-height:1.8;
+}
+.warn b{color:#B91C1C}
+
+.foot{text-align:center; margin-top:34px}
+.foot .big{
+  font-size:26px; font-weight:900; letter-spacing:-.01em;
+  background:linear-gradient(90deg,var(--s1a),var(--s2a),var(--s3a));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.foot .brand{margin-top:8px; font-size:13.5px; color:var(--text); letter-spacing:.06em}
+
+@media(max-width:780px){
+  .grid{grid-template-columns:1fr}
+  .nogo .two{grid-template-columns:1fr}
+  .hero h1{font-size:30px}
+  .bot,.bot2{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <svg class="bot2" width="74" height="84" viewBox="0 0 74 84">
+      <ellipse cx="37" cy="80" rx="22" ry="4" fill="#0F172A" opacity=".08"/>
+      <rect x="16" y="34" width="42" height="40" rx="17" fill="#5B9BFF"/>
+      <circle cx="37" cy="24" r="19" fill="#7FB2FF"/>
+      <ellipse cx="37" cy="25" rx="14" ry="10" fill="#0F172A"/>
+      <circle cx="32" cy="24" r="3.2" fill="#fff"/><circle cx="42" cy="24" r="3.2" fill="#fff"/>
+      <circle cx="12" cy="48" r="7" fill="#5B9BFF"/><circle cx="62" cy="48" r="7" fill="#5B9BFF"/>
+    </svg>
+    <h1>AI Agent <span class="hl">輔助研究配方</span><br>的 <span class="hl2">8 個步驟</span></h1>
+    <div class="sub">Agent 只做前置研究，配方決策永遠在人</div>
+    <div class="chips">
+      <span class="chip">法規先框</span><span class="chip">文獻可查</span>
+      <span class="chip">證據分級</span><span class="chip">候選僅供討論</span>
+      <span class="chip">實驗驗證</span>
+    </div>
+    <svg class="bot" width="74" height="84" viewBox="0 0 74 84">
+      <ellipse cx="37" cy="80" rx="22" ry="4" fill="#0F172A" opacity=".08"/>
+      <rect x="16" y="34" width="42" height="40" rx="17" fill="#F87171"/>
+      <circle cx="37" cy="24" r="19" fill="#FCA5A5"/>
+      <ellipse cx="37" cy="25" rx="14" ry="10" fill="#0F172A"/>
+      <circle cx="32" cy="24" r="3.2" fill="#fff"/><circle cx="42" cy="24" r="3.2" fill="#fff"/>
+      <circle cx="12" cy="48" r="7" fill="#F87171"/><circle cx="62" cy="48" r="7" fill="#F87171"/>
+    </svg>
+  </div>
+
+  <div class="topwarn">
+    <b>⚠️ 全系列風險最高的一張。</b>本流程僅涵蓋<b>文獻檢索、資料整理與候選方向探索</b>，
+    產出一律視為<b>待驗證的討論素材</b>。
+    配方組成、劑量、安全性與有效性，<b>必須由研發、品保與法規專業人員依實驗數據判定</b>。
+  </div>
+
+  <div class="grid">
+
+    <div class="phase"><span class="dot" style="background:var(--s1a)"></span>前置理解｜先把法規與範圍框住</div>
+
+    <div class="card s1">
+      <div class="top"><div class="num">01</div><h3>命題界定<span>｜定義研發目標</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><circle cx="28" cy="28" r="21" fill="none" stroke="#2F6FED" stroke-width="3.2"/><circle cx="28" cy="28" r="12" fill="none" stroke="#5B9BFF" stroke-width="3"/><circle cx="28" cy="28" r="4.5" fill="#2F6FED"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">AI Agent</span><span class="tool">研發命題書</span></div>
+          <div class="pt"><b>✓</b><span>目標族群、使用情境、劑型</span></div>
+          <div class="pt"><b>✓</b><span>產品定位屬於哪一類食品分類</span></div>
+        </div>
+      </div>
+      <div class="action">💡 產品類別決定後面所有規則</div>
+    </div>
+
+    <div class="card s1">
+      <div class="top"><div class="num">02</div><h3>法規框定<span>｜先劃出可用範圍</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M28 6v42M12 48h32" stroke="#2F6FED" stroke-width="3.4" stroke-linecap="round"/><path d="M28 13L13 21l7 9h-14l7-9M28 13l15 8-7 9h14l-7-9" fill="none" stroke="#5B9BFF" stroke-width="2.8" stroke-linejoin="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">原料正面表列</span><span class="tool">主管機關公告</span></div>
+          <div class="pt"><b>✓</b><span>可用原料、限量與使用範圍現查</span></div>
+          <div class="pt"><b>✓</b><span>不可用者直接排除，不進候選池</span></div>
+        </div>
+      </div>
+      <div class="action">💡 先框法規，才不會做出不能上市的東西</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s2a)"></span>證據蒐集｜找文獻，並判斷可信度</div>
+
+    <div class="card s2">
+      <div class="top"><div class="num">03</div><h3>文獻檢索<span>｜蒐集研究資料</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><circle cx="24" cy="24" r="15" fill="none" stroke="#6C4CE0" stroke-width="3.4"/><path d="M35 35l12 12" stroke="#6C4CE0" stroke-width="3.6" stroke-linecap="round"/><path d="M18 24h12M24 18v12" stroke="#9A7CF5" stroke-width="3" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">學術資料庫</span><span class="tool">專利檢索</span></div>
+          <div class="pt"><b>✓</b><span>原料研究、既有專利、公開試驗</span></div>
+          <div class="pt"><b>✓</b><span>每筆記下 DOI／出處與年份</span></div>
+        </div>
+      </div>
+      <div class="action">💡 查不到原始文獻的說法，一律不採用</div>
+    </div>
+
+    <div class="card s2">
+      <div class="top"><div class="num">04</div><h3>證據分級<span>｜區分強弱可信度</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="8" y="32" width="11" height="16" rx="3" fill="#C7B4FF"/><rect x="23" y="22" width="11" height="26" rx="3" fill="#9A7CF5"/><rect x="38" y="10" width="11" height="38" rx="3" fill="#6C4CE0"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">證據等級表</span><span class="tool">交叉查證</span></div>
+          <div class="pt"><b>✓</b><span>人體試驗 &gt; 動物 &gt; 體外 &gt; 傳統使用</span></div>
+          <div class="pt"><b>✓</b><span>樣本數、設計、利益衝突一併標註</span></div>
+        </div>
+      </div>
+      <div class="action">💡 有研究不等於有效，要看證據等級</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s3a)"></span>候選探索｜整理方向，全部待驗證</div>
+
+    <div class="card s3">
+      <div class="top"><div class="num">05</div><h3>候選整理<span>｜列出探索方向</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="7" y="10" width="42" height="36" rx="4" fill="none" stroke="#F97316" stroke-width="3.2"/><path d="M7 21h42M21 21v25M35 21v25" stroke="#FBA94C" stroke-width="2.8"/><rect x="7" y="10" width="42" height="11" rx="4" fill="#FBA94C" opacity=".45"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">候選矩陣</span><span class="tool">AI Agent</span></div>
+          <div class="pt"><b>✓</b><span>原料、機轉、證據強度並列比較</span></div>
+          <div class="pt"><b>✓</b><span>僅列方向，不建議劑量與比例</span></div>
+        </div>
+      </div>
+      <div class="action">💡 這是討論清單，不是配方單</div>
+    </div>
+
+    <div class="card s3">
+      <div class="top"><div class="num">06</div><h3>風險預檢<span>｜先標出疑慮點</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M28 7l22 40H6z" fill="none" stroke="#F97316" stroke-width="3.4" stroke-linejoin="round"/><path d="M28 22v12" stroke="#F97316" stroke-width="3.6" stroke-linecap="round"/><circle cx="28" cy="40" r="2.6" fill="#F97316"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">風險清單</span><span class="tool">專利迴避檢視</span></div>
+          <div class="pt"><b>✓</b><span>過敏原、族群禁忌、專利衝突</span></div>
+          <div class="pt"><b>✓</b><span>疑慮全標為待專業確認，不下結論</span></div>
+        </div>
+      </div>
+      <div class="action">💡 Agent 提出疑慮，不判定安全與否</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s4a)"></span>實驗驗證｜有數據才算數</div>
+
+    <div class="card s4">
+      <div class="top"><div class="num">07</div><h3>試驗協助<span>｜整理驗證計畫</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M23 6v14L11 42a5 5 0 0 0 4 8h26a5 5 0 0 0 4-8L33 20V6" fill="none" stroke="#10B981" stroke-width="3.2" stroke-linejoin="round"/><path d="M19 6h18" stroke="#10B981" stroke-width="3.4" stroke-linecap="round"/><path d="M17 34h22" stroke="#4ADE80" stroke-width="3.2" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">計畫整理</span><span class="tool">研發人員定案</span></div>
+          <div class="pt"><b>✓</b><span>穩定性、感官、檢驗項目清單化</span></div>
+          <div class="pt"><b>✓</b><span>試驗設計由研發與品保拍板</span></div>
+        </div>
+      </div>
+      <div class="action">💡 Agent 幫忙整理，不設計實驗參數</div>
+    </div>
+
+    <div class="card s4">
+      <div class="top"><div class="num">08</div><h3>專業定案<span>｜雙重驗證放行</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="11" y="8" width="34" height="42" rx="4" fill="none" stroke="#10B981" stroke-width="3.2"/><rect x="21" y="4" width="14" height="8" rx="2.5" fill="#10B981"/><path d="M19 26l5 5 11-11" stroke="#4ADE80" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 40h18" stroke="#4ADE80" stroke-width="3.2" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">檢驗數據</span><span class="tool">法規 / 專業審查</span></div>
+          <div class="pt"><b>✓</b><span>以實測數據取代所有推論</span></div>
+          <div class="pt"><b>✓</b><span>研發、品保、法規三方確認簽核</span></div>
+        </div>
+      </div>
+      <div class="action">💡 沒有實驗數據，就沒有配方定案</div>
+    </div>
+
+    <div class="nogo">
+      <h4>🚧 這張卡最重要的一頁：Agent 的能與不能</h4>
+      <div class="two">
+        <div class="side can">
+          <h5>✅ Agent 可以做</h5>
+          <ul>
+            <li><span>›</span>大量檢索文獻、專利與公開資料</li>
+            <li><span>›</span>整理原料機轉與研究結論摘要</li>
+            <li><span>›</span>標註證據等級與來源出處</li>
+            <li><span>›</span>比對法規正面表列，排除不可用原料</li>
+            <li><span>›</span>列出待確認的風險與疑慮清單</li>
+            <li><span>›</span>把檢驗與試驗項目整理成清單</li>
+          </ul>
+        </div>
+        <div class="side cant">
+          <h5>⛔ Agent 不可以做</h5>
+          <ul>
+            <li><span>×</span>決定最終配方組成與各原料比例</li>
+            <li><span>×</span>建議攝取劑量或使用上限</li>
+            <li><span>×</span>判定安全性、有效性或副作用</li>
+            <li><span>×</span>取代動物或人體試驗數據</li>
+            <li><span>×</span>產生任何療效或保健功效宣稱</li>
+            <li><span>×</span>認定某原料「可以合法使用」</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="warn">
+      <b>⚠️ 為什麼這張卡的界線畫得比前八張都嚴？</b>
+      因為前面八種任務出錯，代價是重做、客訴或行政處罰；<b>配方出錯，代價是有人吃下去</b>。<br>
+      Agent 在這裡的價值是<b>把研發人員從文獻海裡撈出來</b>——原本要花兩週讀完的資料，
+      它一天整理好、標好證據等級、附好出處。但它讀過的東西再多，
+      <b>也無法替代一次實驗、一份檢驗報告、一位專業人員的判斷</b>。<br>
+      本流程<b>不構成配方、醫療或法規建議</b>；產品開發與上市前，請依相關法規並經專業人員審查確認。
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <div class="big">用 AI 放大創意・用 Agent 輕鬆執行</div>
+    <div class="brand">AI Coach 益力康陳董｜2026 AI to Agent</div>
+  </div>
+
+</div>
+</body>
+</html>

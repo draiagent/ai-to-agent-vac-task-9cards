@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Agent 做財務月報表的 8 個步驟</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+:root{
+  --bg-a:#EAF2FB; --bg-b:#F6F9FD;
+  --ink:#0F172A; --text:#5B6472; --line:#E5E9EF;
+  --s1a:#2F6FED; --s1b:#5B9BFF;
+  --s2a:#6C4CE0; --s2b:#9A7CF5;
+  --s3a:#F97316; --s3b:#FBA94C;
+  --s4a:#10B981; --s4b:#4ADE80;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Noto Sans TC','Inter',sans-serif;
+  background:linear-gradient(170deg,var(--bg-a),var(--bg-b) 45%,#FFF);
+  color:var(--ink); padding:34px 22px 60px;
+}
+.wrap{max-width:1080px;margin:0 auto}
+
+.hero{
+  position:relative; text-align:center; padding:26px 20px 30px;
+  background:linear-gradient(135deg,#DCEAFB,#EEF4FD);
+  border-radius:26px; overflow:hidden; margin-bottom:24px;
+}
+.hero h1{font-size:44px; font-weight:900; letter-spacing:-.02em; line-height:1.2}
+.hero h1 .hl{color:var(--s1a)}
+.hero h1 .hl2{color:var(--s3a)}
+.hero .sub{
+  display:inline-block; margin-top:12px; padding:8px 22px;
+  background:var(--ink); color:#fff; border-radius:999px;
+  font-size:16px; font-weight:700;
+}
+.chips{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:16px}
+.chip{
+  background:#fff; border:1px solid var(--line); border-radius:999px;
+  padding:6px 15px; font-size:13px; font-weight:700; color:var(--s1a);
+}
+.chip:nth-child(2){color:var(--s2a)} .chip:nth-child(3){color:var(--s3a)}
+.chip:nth-child(4){color:var(--s4a)} .chip:nth-child(5){color:#0EA5E9}
+.bot{position:absolute; right:20px; bottom:8px}
+.bot2{position:absolute; left:20px; bottom:8px; transform:scaleX(-1)}
+
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+.card{
+  background:#fff; border-radius:22px; overflow:hidden;
+  box-shadow:0 10px 34px rgba(15,23,42,.07);
+  display:flex; flex-direction:column;
+}
+.card .top{display:flex; align-items:stretch; gap:14px; padding:16px 18px 4px}
+.num{
+  min-width:62px; height:48px; border-radius:12px; color:#fff;
+  font:900 22px/48px 'Inter',sans-serif; text-align:center; letter-spacing:.02em;
+}
+.card h3{font-size:20px; font-weight:900; line-height:48px; letter-spacing:-.01em}
+.card h3 span{font-size:14px; font-weight:600; color:var(--text); margin-left:8px}
+.body{padding:6px 18px 16px; display:flex; gap:14px; align-items:flex-start}
+.ico{width:56px; height:56px; flex:0 0 56px; margin-top:4px}
+.col{flex:1}
+.tools{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:9px}
+.tool{font-size:12.5px; font-weight:700; padding:5px 11px; border-radius:8px; white-space:nowrap}
+.pt{font-size:13.5px; color:var(--text); line-height:1.75; display:flex; gap:7px}
+.pt b{font-weight:900; flex:0 0 auto}
+.action{margin-top:auto; color:#fff; font-size:14px; font-weight:700; padding:11px 18px; text-align:center}
+
+.s1 .num{background:linear-gradient(135deg,var(--s1a),var(--s1b))}
+.s1 .tool{background:#E3EDFE;color:var(--s1a)} .s1 .pt b{color:var(--s1a)}
+.s1 .action{background:linear-gradient(90deg,var(--s1a),var(--s1b))}
+.s2 .num{background:linear-gradient(135deg,var(--s2a),var(--s2b))}
+.s2 .tool{background:#EFEAFB;color:var(--s2a)} .s2 .pt b{color:var(--s2a)}
+.s2 .action{background:linear-gradient(90deg,var(--s2a),var(--s2b))}
+.s3 .num{background:linear-gradient(135deg,var(--s3a),var(--s3b))}
+.s3 .tool{background:#FEEBD9;color:#C2560A} .s3 .pt b{color:var(--s3a)}
+.s3 .action{background:linear-gradient(90deg,var(--s3a),var(--s3b))}
+.s4 .num{background:linear-gradient(135deg,var(--s4a),var(--s4b))}
+.s4 .tool{background:#D9F7EA;color:#047857} .s4 .pt b{color:#047857}
+.s4 .action{background:linear-gradient(90deg,var(--s4a),var(--s4b))}
+
+.phase{
+  grid-column:1/-1; display:flex; align-items:center; gap:12px;
+  font-size:13px; font-weight:900; letter-spacing:.1em; color:var(--text);
+  margin:8px 2px 0;
+}
+.phase::after{content:"";flex:1;height:1px;background:var(--line)}
+.dot{width:10px;height:10px;border-radius:50%}
+
+.warn{
+  grid-column:1/-1; margin-top:18px;
+  background:#FFF7ED; border:1px solid #FED7AA; border-left:5px solid #F97316;
+  border-radius:14px; padding:14px 18px;
+  font-size:13.5px; color:#7C2D12; line-height:1.7;
+}
+.warn b{color:#C2410C}
+
+.foot{text-align:center; margin-top:34px}
+.foot .big{
+  font-size:26px; font-weight:900; letter-spacing:-.01em;
+  background:linear-gradient(90deg,var(--s1a),var(--s2a),var(--s3a));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.foot .brand{margin-top:8px; font-size:13.5px; color:var(--text); letter-spacing:.06em}
+
+@media(max-width:780px){
+  .grid{grid-template-columns:1fr}
+  .hero h1{font-size:30px}
+  .bot,.bot2{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <svg class="bot2" width="74" height="84" viewBox="0 0 74 84">
+      <ellipse cx="37" cy="80" rx="22" ry="4" fill="#0F172A" opacity=".08"/>
+      <rect x="16" y="34" width="42" height="40" rx="17" fill="#5B9BFF"/>
+      <circle cx="37" cy="24" r="19" fill="#7FB2FF"/>
+      <ellipse cx="37" cy="25" rx="14" ry="10" fill="#0F172A"/>
+      <circle cx="32" cy="24" r="3.2" fill="#fff"/><circle cx="42" cy="24" r="3.2" fill="#fff"/>
+      <circle cx="12" cy="48" r="7" fill="#5B9BFF"/><circle cx="62" cy="48" r="7" fill="#5B9BFF"/>
+    </svg>
+    <h1>AI Agent 做<span class="hl">財務月報表</span><br>的 <span class="hl2">8 個步驟</span></h1>
+    <div class="sub">Agent 算得快，數字仍要人負責</div>
+    <div class="chips">
+      <span class="chip">來源可追溯</span><span class="chip">科目一致</span>
+      <span class="chip">勾稽相符</span><span class="chip">差異有解釋</span>
+      <span class="chip">簽核留痕</span>
+    </div>
+    <svg class="bot" width="74" height="84" viewBox="0 0 74 84">
+      <ellipse cx="37" cy="80" rx="22" ry="4" fill="#0F172A" opacity=".08"/>
+      <rect x="16" y="34" width="42" height="40" rx="17" fill="#4ADE80"/>
+      <circle cx="37" cy="24" r="19" fill="#86EFAC"/>
+      <ellipse cx="37" cy="25" rx="14" ry="10" fill="#0F172A"/>
+      <circle cx="32" cy="24" r="3.2" fill="#fff"/><circle cx="42" cy="24" r="3.2" fill="#fff"/>
+      <circle cx="12" cy="48" r="7" fill="#4ADE80"/><circle cx="62" cy="48" r="7" fill="#4ADE80"/>
+    </svg>
+  </div>
+
+  <div class="grid">
+
+    <div class="phase"><span class="dot" style="background:var(--s1a)"></span>前置理解｜先確定報表要回答什麼</div>
+
+    <div class="card s1">
+      <div class="top"><div class="num">01</div><h3>需求定義<span>｜報給誰、看什麼</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="9" y="7" width="38" height="42" rx="5" fill="none" stroke="#2F6FED" stroke-width="3.2"/><path d="M17 20h22M17 28h22M17 36h13" stroke="#5B9BFF" stroke-width="3.2" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">AI Agent</span><span class="tool">報表規格書</span></div>
+          <div class="pt"><b>✓</b><span>董事會 / 銀行 / 內部管理用</span></div>
+          <div class="pt"><b>✓</b><span>期間、幣別、指標範圍</span></div>
+        </div>
+      </div>
+      <div class="action">💡 先定規格，每月才能自動重跑</div>
+    </div>
+
+    <div class="card s1">
+      <div class="top"><div class="num">02</div><h3>資料串接<span>｜接上真實來源</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><ellipse cx="28" cy="13" rx="18" ry="7" fill="none" stroke="#2F6FED" stroke-width="3.2"/><path d="M10 13v30c0 3.9 8 7 18 7s18-3.1 18-7V13" fill="none" stroke="#2F6FED" stroke-width="3.2"/><path d="M10 28c0 3.9 8 7 18 7s18-3.1 18-7" fill="none" stroke="#5B9BFF" stroke-width="3"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">ERP / 會計系統</span><span class="tool">Excel / CSV</span></div>
+          <div class="pt"><b>✓</b><span>總帳、銀行對帳、應收應付</span></div>
+          <div class="pt"><b>✓</b><span>權限控管、唯讀存取</span></div>
+        </div>
+      </div>
+      <div class="action">💡 只接來源系統，不讓 Agent 猜數字</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s2a)"></span>資料處理｜把散亂數字變成可算的表</div>
+
+    <div class="card s2">
+      <div class="top"><div class="num">03</div><h3>資料清洗<span>｜統一格式與科目</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M10 9h36l-14 17v20l-8 4V26z" fill="none" stroke="#6C4CE0" stroke-width="3.2" stroke-linejoin="round"/><circle cx="43" cy="41" r="8" fill="#9A7CF5"/><path d="M40 41h6M43 38v6" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">pandas</span><span class="tool">科目對照表</span></div>
+          <div class="pt"><b>✓</b><span>科目歸戶、幣別換算、期間切分</span></div>
+          <div class="pt"><b>✓</b><span>重複、缺漏、異常值標記</span></div>
+        </div>
+      </div>
+      <div class="action">💡 髒資料進去，錯報表出來</div>
+    </div>
+
+    <div class="card s2">
+      <div class="top"><div class="num">04</div><h3>指標計算<span>｜跑出核心數字</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="11" y="6" width="34" height="44" rx="5" fill="none" stroke="#6C4CE0" stroke-width="3.2"/><rect x="17" y="12" width="22" height="8" rx="2" fill="#C7B4FF"/><circle cx="21" cy="29" r="3.4" fill="#9A7CF5"/><circle cx="32" cy="29" r="3.4" fill="#9A7CF5"/><circle cx="21" cy="40" r="3.4" fill="#9A7CF5"/><circle cx="32" cy="40" r="3.4" fill="#6C4CE0"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">pandas</span><span class="tool">財務公式庫</span></div>
+          <div class="pt"><b>✓</b><span>營收、毛利率、營益率、淨利</span></div>
+          <div class="pt"><b>✓</b><span>現金流、應收帳齡、存貨週轉</span></div>
+        </div>
+      </div>
+      <div class="action">💡 公式寫成程式，每月結果才一致</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s3a)"></span>分析產出｜讓數字說出發生什麼事</div>
+
+    <div class="card s3">
+      <div class="top"><div class="num">05</div><h3>差異分析<span>｜找出異常波動</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M7 42l12-14 10 8 9-13 11 9" stroke="#F97316" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="38" cy="23" r="5" fill="#FBA94C"/><path d="M7 50h42" stroke="#FBA94C" stroke-width="3" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">AI Agent</span><span class="tool">預算 / 同期對比</span></div>
+          <div class="pt"><b>✓</b><span>對比預算、上月、去年同期</span></div>
+          <div class="pt"><b>✓</b><span>Agent 列出可能原因供人判斷</span></div>
+        </div>
+      </div>
+      <div class="action">💡 Agent 找異常，原因由人確認</div>
+    </div>
+
+    <div class="card s3">
+      <div class="top"><div class="num">06</div><h3>圖表產出<span>｜數據視覺化</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="8" y="30" width="9" height="18" rx="2" fill="#FBA94C"/><rect x="23" y="18" width="9" height="30" rx="2" fill="#F97316"/><rect x="38" y="24" width="9" height="24" rx="2" fill="#FBA94C"/><path d="M8 12l12 6 12-9 12 5" stroke="#F97316" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">matplotlib</span><span class="tool">ECharts</span></div>
+          <div class="pt"><b>✓</b><span>趨勢、佔比、瀑布圖</span></div>
+          <div class="pt"><b>✓</b><span>座標軸不截斷、單位標清楚</span></div>
+        </div>
+      </div>
+      <div class="action">💡 圖表要誠實，不能放大好消息</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s4a)"></span>整合驗收｜簽核前的最後把關</div>
+
+    <div class="card s4">
+      <div class="top"><div class="num">07</div><h3>報告組裝<span>｜輸出正式報表</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="8" y="8" width="30" height="40" rx="4" fill="none" stroke="#10B981" stroke-width="3.2"/><path d="M16 20h14M16 28h14M16 36h9" stroke="#4ADE80" stroke-width="3" stroke-linecap="round"/><rect x="34" y="20" width="14" height="20" rx="3" fill="#10B981"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">openpyxl</span><span class="tool">python-pptx</span></div>
+          <div class="pt"><b>✓</b><span>摘要、明細、附註套用母版</span></div>
+          <div class="pt"><b>✓</b><span>每個數字標註資料來源</span></div>
+        </div>
+      </div>
+      <div class="action">💡 數字要能一路追回原始憑證</div>
+    </div>
+
+    <div class="card s4">
+      <div class="top"><div class="num">08</div><h3>覆核簽名<span>｜人工核准放行</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="11" y="8" width="34" height="42" rx="4" fill="none" stroke="#10B981" stroke-width="3.2"/><rect x="21" y="4" width="14" height="8" rx="2.5" fill="#10B981"/><path d="M19 26l5 5 11-11" stroke="#4ADE80" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 40h18" stroke="#4ADE80" stroke-width="3.2" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">Agent 勾稽檢查</span><span class="tool">財會主管簽核</span></div>
+          <div class="pt"><b>✓</b><span>借貸平衡、表表相符、加總勾稽</span></div>
+          <div class="pt"><b>✓</b><span>版本留存、簽核紀錄可查</span></div>
+        </div>
+      </div>
+      <div class="action">💡 對外送出前，一定要人簽名負責</div>
+    </div>
+
+    <div class="warn">
+      <b>⚠️ 導入前提醒：</b>本流程用於<b>管理用途的月報彙整與分析</b>，不取代會計師查核或正式財報編製。
+      Agent 只做「取數、計算、比對、提示異常」，<b>科目判斷、estimates 認列與最終數字，仍須由財會人員負責</b>。
+      涉及稅務、外部申報或公開揭露時，務必依會計準則與主管機關規定辦理。
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <div class="big">用 AI 放大創意・用 Agent 輕鬆執行</div>
+    <div class="brand">AI Coach 益力康陳董｜2026 AI to Agent</div>
+  </div>
+
+</div>
+</body>
+</html>

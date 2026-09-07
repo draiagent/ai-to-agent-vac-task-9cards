@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Agent 做競品分析的 8 個步驟</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+:root{
+  --bg-a:#EAF2FB; --bg-b:#F6F9FD;
+  --ink:#0F172A; --text:#5B6472; --line:#E5E9EF;
+  --s1a:#2F6FED; --s1b:#5B9BFF;
+  --s2a:#6C4CE0; --s2b:#9A7CF5;
+  --s3a:#F97316; --s3b:#FBA94C;
+  --s4a:#10B981; --s4b:#4ADE80;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Noto Sans TC','Inter',sans-serif;
+  background:linear-gradient(170deg,var(--bg-a),var(--bg-b) 45%,#FFF);
+  color:var(--ink); padding:34px 22px 60px;
+}
+.wrap{max-width:1080px;margin:0 auto}
+
+.hero{
+  position:relative; text-align:center; padding:26px 20px 30px;
+  background:linear-gradient(135deg,#DCEAFB,#EEF4FD);
+  border-radius:26px; overflow:hidden; margin-bottom:24px;
+}
+.hero h1{font-size:44px; font-weight:900; letter-spacing:-.02em; line-height:1.2}
+.hero h1 .hl{color:var(--s1a)}
+.hero h1 .hl2{color:var(--s3a)}
+.hero .sub{
+  display:inline-block; margin-top:12px; padding:8px 22px;
+  background:var(--ink); color:#fff; border-radius:999px;
+  font-size:16px; font-weight:700;
+}
+.chips{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:16px}
+.chip{
+  background:#fff; border:1px solid var(--line); border-radius:999px;
+  padding:6px 15px; font-size:13px; font-weight:700; color:var(--s1a);
+}
+.chip:nth-child(2){color:var(--s2a)} .chip:nth-child(3){color:var(--s3a)}
+.chip:nth-child(4){color:var(--s4a)} .chip:nth-child(5){color:#0EA5E9}
+.bot{position:absolute; right:20px; bottom:8px}
+.bot2{position:absolute; left:20px; bottom:8px; transform:scaleX(-1)}
+
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+.card{
+  background:#fff; border-radius:22px; overflow:hidden;
+  box-shadow:0 10px 34px rgba(15,23,42,.07);
+  display:flex; flex-direction:column;
+}
+.card .top{display:flex; align-items:stretch; gap:14px; padding:16px 18px 4px}
+.num{
+  min-width:62px; height:48px; border-radius:12px; color:#fff;
+  font:900 22px/48px 'Inter',sans-serif; text-align:center; letter-spacing:.02em;
+}
+.card h3{font-size:20px; font-weight:900; line-height:48px; letter-spacing:-.01em}
+.card h3 span{font-size:14px; font-weight:600; color:var(--text); margin-left:8px}
+.body{padding:6px 18px 16px; display:flex; gap:14px; align-items:flex-start}
+.ico{width:56px; height:56px; flex:0 0 56px; margin-top:4px}
+.col{flex:1}
+.tools{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:9px}
+.tool{font-size:12.5px; font-weight:700; padding:5px 11px; border-radius:8px; white-space:nowrap}
+.pt{font-size:13.5px; color:var(--text); line-height:1.75; display:flex; gap:7px}
+.pt b{font-weight:900; flex:0 0 auto}
+.action{margin-top:auto; color:#fff; font-size:14px; font-weight:700; padding:11px 18px; text-align:center}
+
+.s1 .num{background:linear-gradient(135deg,var(--s1a),var(--s1b))}
+.s1 .tool{background:#E3EDFE;color:var(--s1a)} .s1 .pt b{color:var(--s1a)}
+.s1 .action{background:linear-gradient(90deg,var(--s1a),var(--s1b))}
+.s2 .num{background:linear-gradient(135deg,var(--s2a),var(--s2b))}
+.s2 .tool{background:#EFEAFB;color:var(--s2a)} .s2 .pt b{color:var(--s2a)}
+.s2 .action{background:linear-gradient(90deg,var(--s2a),var(--s2b))}
+.s3 .num{background:linear-gradient(135deg,var(--s3a),var(--s3b))}
+.s3 .tool{background:#FEEBD9;color:#C2560A} .s3 .pt b{color:var(--s3a)}
+.s3 .action{background:linear-gradient(90deg,var(--s3a),var(--s3b))}
+.s4 .num{background:linear-gradient(135deg,var(--s4a),var(--s4b))}
+.s4 .tool{background:#D9F7EA;color:#047857} .s4 .pt b{color:#047857}
+.s4 .action{background:linear-gradient(90deg,var(--s4a),var(--s4b))}
+
+.phase{
+  grid-column:1/-1; display:flex; align-items:center; gap:12px;
+  font-size:13px; font-weight:900; letter-spacing:.1em; color:var(--text);
+  margin:8px 2px 0;
+}
+.phase::after{content:"";flex:1;height:1px;background:var(--line)}
+.dot{width:10px;height:10px;border-radius:50%}
+
+.warn{
+  grid-column:1/-1; margin-top:18px;
+  background:#FEF2F2; border:1px solid #FECACA; border-left:5px solid #EF4444;
+  border-radius:14px; padding:14px 18px;
+  font-size:13.5px; color:#7F1D1D; line-height:1.75;
+}
+.warn b{color:#B91C1C}
+
+.foot{text-align:center; margin-top:34px}
+.foot .big{
+  font-size:26px; font-weight:900; letter-spacing:-.01em;
+  background:linear-gradient(90deg,var(--s1a),var(--s2a),var(--s3a));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.foot .brand{margin-top:8px; font-size:13.5px; color:var(--text); letter-spacing:.06em}
+
+@media(max-width:780px){
+  .grid{grid-template-columns:1fr}
+  .hero h1{font-size:30px}
+  .bot,.bot2{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <svg class="bot2" width="74" height="84" viewBox="0 0 74 84">
+      <ellipse cx="37" cy="80" rx="22" ry="4" fill="#0F172A" opacity=".08"/>
+      <rect x="16" y="34" width="42" height="40" rx="17" fill="#5B9BFF"/>
+      <circle cx="37" cy="24" r="19" fill="#7FB2FF"/>
+      <ellipse cx="37" cy="25" rx="14" ry="10" fill="#0F172A"/>
+      <circle cx="32" cy="24" r="3.2" fill="#fff"/><circle cx="42" cy="24" r="3.2" fill="#fff"/>
+      <circle cx="12" cy="48" r="7" fill="#5B9BFF"/><circle cx="62" cy="48" r="7" fill="#5B9BFF"/>
+    </svg>
+    <h1>AI Agent 做<span class="hl">競品分析</span><br>的 <span class="hl2">8 個步驟</span></h1>
+    <div class="sub">Agent 查得廣，來源仍要人驗證</div>
+    <div class="chips">
+      <span class="chip">範圍明確</span><span class="chip">來源可查</span>
+      <span class="chip">交叉驗證</span><span class="chip">事實推測分開</span>
+      <span class="chip">比較合規</span>
+    </div>
+    <svg class="bot" width="74" height="84" viewBox="0 0 74 84">
+      <ellipse cx="37" cy="80" rx="22" ry="4" fill="#0F172A" opacity=".08"/>
+      <rect x="16" y="34" width="42" height="40" rx="17" fill="#F87171"/>
+      <circle cx="37" cy="24" r="19" fill="#FCA5A5"/>
+      <ellipse cx="37" cy="25" rx="14" ry="10" fill="#0F172A"/>
+      <circle cx="32" cy="24" r="3.2" fill="#fff"/><circle cx="42" cy="24" r="3.2" fill="#fff"/>
+      <circle cx="12" cy="48" r="7" fill="#F87171"/><circle cx="62" cy="48" r="7" fill="#F87171"/>
+    </svg>
+  </div>
+
+  <div class="grid">
+
+    <div class="phase"><span class="dot" style="background:var(--s1a)"></span>前置理解｜先確定要比誰、比什麼</div>
+
+    <div class="card s1">
+      <div class="top"><div class="num">01</div><h3>範圍界定<span>｜定義誰是競品</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><circle cx="28" cy="28" r="20" fill="none" stroke="#2F6FED" stroke-width="3.2"/><path d="M28 8v40M8 28h40" stroke="#5B9BFF" stroke-width="2.6"/><circle cx="38" cy="19" r="5" fill="#2F6FED"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">AI Agent</span><span class="tool">競品清單</span></div>
+          <div class="pt"><b>✓</b><span>直接、間接、替代型競品分層</span></div>
+          <div class="pt"><b>✓</b><span>這份分析要回答什麼決策</span></div>
+        </div>
+      </div>
+      <div class="action">💡 沒有決策目的，分析就會失焦</div>
+    </div>
+
+    <div class="card s1">
+      <div class="top"><div class="num">02</div><h3>來源盤點<span>｜先列可信管道</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M8 16h16l4 5h20v24a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4z" fill="none" stroke="#2F6FED" stroke-width="3.2" stroke-linejoin="round"/><path d="M18 33h20M18 39h13" stroke="#5B9BFF" stroke-width="3.2" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">官網 / 公開財報</span><span class="tool">法規資料庫</span></div>
+          <div class="pt"><b>✓</b><span>一手來源優先於媒體轉述</span></div>
+          <div class="pt"><b>✓</b><span>電商評論、通路實地也是資料</span></div>
+        </div>
+      </div>
+      <div class="action">💡 先定好來源，再讓 Agent 去找</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s2a)"></span>蒐集查證｜先找得廣，再驗得準</div>
+
+    <div class="card s2">
+      <div class="top"><div class="num">03</div><h3>廣度蒐集<span>｜大量抓取資料</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><circle cx="24" cy="24" r="15" fill="none" stroke="#6C4CE0" stroke-width="3.4"/><path d="M35 35l12 12" stroke="#6C4CE0" stroke-width="3.6" stroke-linecap="round"/><path d="M18 24h12M24 18v12" stroke="#9A7CF5" stroke-width="3" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">Web Search</span><span class="tool">AI Agent</span></div>
+          <div class="pt"><b>✓</b><span>產品、定價、通路、訴求、規模</span></div>
+          <div class="pt"><b>✓</b><span>每筆資料同時記下網址與日期</span></div>
+        </div>
+      </div>
+      <div class="action">💡 抓資料的同時就要記來源</div>
+    </div>
+
+    <div class="card s2">
+      <div class="top"><div class="num">04</div><h3>來源驗證<span>｜逐筆回溯查核</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M28 5l19 8v14c0 12-8 21-19 24C17 48 9 39 9 27V13z" fill="none" stroke="#6C4CE0" stroke-width="3.2" stroke-linejoin="round"/><path d="M20 27l6 6 12-13" stroke="#9A7CF5" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">交叉查證</span><span class="tool">原始出處回溯</span></div>
+          <div class="pt"><b>✓</b><span>連結能打開、日期未過期</span></div>
+          <div class="pt"><b>✓</b><span>兩個獨立來源對得起來才採用</span></div>
+        </div>
+      </div>
+      <div class="action">💡 查不到出處的數字，一律不採用</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s3a)"></span>分析產出｜從資料變成可用洞察</div>
+
+    <div class="card s3">
+      <div class="top"><div class="num">05</div><h3>結構比對<span>｜拉成對照表</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="7" y="10" width="42" height="36" rx="4" fill="none" stroke="#F97316" stroke-width="3.2"/><path d="M7 21h42M21 21v25M35 21v25" stroke="#FBA94C" stroke-width="2.8"/><rect x="7" y="10" width="42" height="11" rx="4" fill="#FBA94C" opacity=".45"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">對照矩陣</span><span class="tool">AI Agent</span></div>
+          <div class="pt"><b>✓</b><span>同一維度橫向對比，不混欄位</span></div>
+          <div class="pt"><b>✓</b><span>事實與推測分欄標示清楚</span></div>
+        </div>
+      </div>
+      <div class="action">💡 查證過的是事實，其餘標成推測</div>
+    </div>
+
+    <div class="card s3">
+      <div class="top"><div class="num">06</div><h3>洞察萃取<span>｜找出機會缺口</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><path d="M28 6a16 16 0 0 0-9 29v6h18v-6a16 16 0 0 0-9-29z" fill="none" stroke="#F97316" stroke-width="3.2" stroke-linejoin="round"/><path d="M21 47h14M23 51h10" stroke="#FBA94C" stroke-width="3" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">定位圖 / SWOT</span><span class="tool">AI Agent</span></div>
+          <div class="pt"><b>✓</b><span>沒人做的空缺、被低估的族群</span></div>
+          <div class="pt"><b>✓</b><span>威脅點與我方應對選項</span></div>
+        </div>
+      </div>
+      <div class="action">💡 找空缺，不是把對手抄一遍</div>
+    </div>
+
+    <div class="phase"><span class="dot" style="background:var(--s4a)"></span>整合驗收｜出手前的最後把關</div>
+
+    <div class="card s4">
+      <div class="top"><div class="num">07</div><h3>報告組裝<span>｜附上來源標註</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="8" y="8" width="30" height="40" rx="4" fill="none" stroke="#10B981" stroke-width="3.2"/><path d="M16 20h14M16 28h14M16 36h9" stroke="#4ADE80" stroke-width="3" stroke-linecap="round"/><rect x="34" y="20" width="14" height="20" rx="3" fill="#10B981"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">報告母版</span><span class="tool">來源附註</span></div>
+          <div class="pt"><b>✓</b><span>每個數字後面掛連結與日期</span></div>
+          <div class="pt"><b>✓</b><span>標示信心等級：已證實／待查</span></div>
+        </div>
+      </div>
+      <div class="action">💡 沒有來源的結論，就是意見不是分析</div>
+    </div>
+
+    <div class="card s4">
+      <div class="top"><div class="num">08</div><h3>覆核定稿<span>｜人工判讀放行</span></h3></div>
+      <div class="body">
+        <svg class="ico" viewBox="0 0 56 56"><rect x="11" y="8" width="34" height="42" rx="4" fill="none" stroke="#10B981" stroke-width="3.2"/><rect x="21" y="4" width="14" height="8" rx="2.5" fill="#10B981"/><path d="M19 26l5 5 11-11" stroke="#4ADE80" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 40h18" stroke="#4ADE80" stroke-width="3.2" stroke-linecap="round"/></svg>
+        <div class="col">
+          <div class="tools"><span class="tool">Agent QA</span><span class="tool">人工判讀</span></div>
+          <div class="pt"><b>✓</b><span>抽查連結、刪除無法佐證的敘述</span></div>
+          <div class="pt"><b>✓</b><span>對外版本檢查比較用語合規</span></div>
+        </div>
+      </div>
+      <div class="action">💡 對外前，務必刪掉查不到根據的話</div>
+    </div>
+
+    <div class="warn">
+      <b>⚠️ 這類任務的最大風險是「講得很像真的」：</b>Agent 最容易編造的就是<b>市佔率、營收數字與研究報告名稱</b>，
+      而且語氣自信、格式完整，看起來完全不像錯的。所以本流程把<b>來源驗證獨立成第 04 步</b>——
+      查不到出處就不採用，沒有第二來源就標成推測。<br>
+      另提醒：競品比較若要<b>對外發布或用於行銷素材</b>，涉及公平交易法的比較廣告規範，
+      不得為不實陳述或貶損競爭對手；生技保健類還須留意廣告與療效用語限制，建議先經法務或專業人員確認。
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <div class="big">用 AI 放大創意・用 Agent 輕鬆執行</div>
+    <div class="brand">AI Coach 益力康陳董｜2026 AI to Agent</div>
+  </div>
+
+</div>
+</body>
+</html>
